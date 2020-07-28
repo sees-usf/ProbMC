@@ -55,6 +55,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import parser.ast.ModulesFile;
+import prism.ModelType;
 import dipro.run.Config;
 import dipro.util.SolutionTracesRecorder;
 
@@ -626,8 +627,8 @@ public class OptionPanel extends PartPanel {
 	}
 
 	void parseConstants() {
-		m_algoListComboBox.removeAllItems();
-		if (ModulesFile.STOCHASTIC == m_config.getModel().getType())
+		/*m_algoListComboBox.removeAllItems();
+		if (  "CTMC" == m_config.getModel().getTypeString())
 			m_algoListComboBox.addItem(new String("XBF"));
 		if (m_config.propId != -1) {
 			m_algoListComboBox.addItem(new String("K_STAR"));
@@ -638,7 +639,7 @@ public class OptionPanel extends PartPanel {
 		m_traceField.setText(m_config.modelName);
 		m_traceField
 				.setEditable(m_config.solutionTrace != SolutionTracesRecorder.NO_TRACES
-						&& m_config.solutionTrace != SolutionTracesRecorder.DIAG_PATH);
+						&& m_config.solutionTrace != SolutionTracesRecorder.DIAG_PATH);*/
 
 	}
 

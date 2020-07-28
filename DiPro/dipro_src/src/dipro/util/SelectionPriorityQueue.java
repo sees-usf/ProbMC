@@ -48,8 +48,10 @@ public class SelectionPriorityQueue<E> extends PriorityQueue<E> {
 	}
 
 	public E peek() {
-		if (selection.isEmpty())
-			return super.peek();
+		System.out.println("peek - SelectionPriorityQueue");
+		if (selection.isEmpty()) {
+			System.out.println("isEmpty");
+			return super.peek();}
 		return selection.get(0);
 	}
 

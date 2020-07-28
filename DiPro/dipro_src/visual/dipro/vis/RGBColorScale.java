@@ -67,6 +67,7 @@ public class RGBColorScale implements ColorScale {
 			s = in.readLine();
 			i++;
 		}
+		in.close();
 	}
 
 	public Color color(int c) {

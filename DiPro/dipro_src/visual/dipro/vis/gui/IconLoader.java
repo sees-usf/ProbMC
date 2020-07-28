@@ -40,7 +40,7 @@ import dipro.run.Registry;
 public class IconLoader {
 
 	public static ImageIcon get(String icon) {
-		String srcName = "etc"+System.getProperty("file.separator")+icon;
+		String srcName = System.getProperty("file.separator")+icon;
 		URL url = ClassLoader.getSystemResource(srcName);
 		if (url == null) 
 		{

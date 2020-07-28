@@ -39,17 +39,17 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
-import java.lang.reflect.Array;
+//import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
-import java.util.Vector;
+//import java.util.Set;
+//import java.util.Vector;
 import org.apache.commons.lang.StringUtils;
 
 
 import dipro.alg.BF;
 import dipro.graph.Vertex;
-import dipro.h.Heuristic;
+//import dipro.h.Heuristic;
 import dipro.h.PrismHeuristic;
 import dipro.run.Context;
 import dipro.run.Registry;

@@ -84,8 +84,7 @@ public class GraphRandomGenerator {
 		int n = 0;
 		for (int v = 0; v < numVertices; v++) {
 			String outFileName = dir.getCanonicalPath() + "/out_" + v + ".txt";
-			PrintStream stream = new PrintStream(new FileOutputStream(
-					outFileName));
+			PrintStream stream = new PrintStream(new FileOutputStream(outFileName));
 			int k = r.nextInt(maxOutDegree) + 1;
 			System.out.println("Handle " + v + ", " + k + " outgoing edges");
 			n = n + k;
@@ -105,15 +104,14 @@ public class GraphRandomGenerator {
 					if (!f.exists()) {
 						boolean b = f.createNewFile();
 						if (!b)
-							throw new DiProException("Unable to create File: "
-									+ f.getCanonicalPath());
+							throw new DiProException("Unable to create File: " + f.getCanonicalPath());
 					}
 					FileWriter fw = new FileWriter(f, true);
 					fw.write(v + " " + t + " " + w + "\n");
 					fw.close();
 				}
+				stream.close();
 			}
-			stream.close();
 		}
 		String mainFileName = dir.getCanonicalPath() + "/main.txt";
 		PrintStream out = new PrintStream(new FileOutputStream(mainFileName));

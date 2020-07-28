@@ -35,7 +35,7 @@ import prism.PrismException;
 import dipro.alg.BF;
 import dipro.graph.Vertex;
 import dipro.run.Context;
-import dipro.stoch.UniformCTMC;
+//import dipro.stoch.UniformCTMC;
 import dipro.stoch.prism.PrismState;
 
 /*

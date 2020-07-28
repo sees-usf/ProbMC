@@ -161,11 +161,12 @@ public class JungVisualizer extends AbstractVisualizer {
 		d = rootPane.getPreferredSize();
 
 		graph = new DelegateForest<Vertex, DirectedEdge>();
-		if (DEFAULT_LAYOUTER_INDEX != TREE_LAYOUTER_INDEX)
-			model = new DefaultVisualizationModel<Vertex, DirectedEdge>(
+		/*if (DEFAULT_LAYOUTER_INDEX != TREE_LAYOUTER_INDEX);
+			 //Dead code- Will never be executed
+			 * model = new DefaultVisualizationModel<Vertex, DirectedEdge>(
 					createLayout(DEFAULT_LAYOUTER_INDEX), new Dimension(
 							(int) (d.width * 1.5), (int) (d.height * 1.5)));
-		else
+		else*/
 			model = new DefaultVisualizationModel<Vertex, DirectedEdge>(
 					createLayout(DEFAULT_LAYOUTER_INDEX));
 

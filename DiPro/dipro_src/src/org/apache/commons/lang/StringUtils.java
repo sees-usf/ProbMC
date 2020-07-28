@@ -2243,7 +2243,7 @@ public class StringUtils {
         }
         int closeLen = close.length();
         int openLen = open.length();
-        List list = new ArrayList();
+        List<String> list = new ArrayList();
         int pos = 0;
         while (pos < (strLen - closeLen)) {
             int start = str.indexOf(open, pos);
@@ -2729,7 +2729,7 @@ public class StringUtils {
         if (len == 0) {
             return ArrayUtils.EMPTY_STRING_ARRAY;
         }
-        List list = new ArrayList();
+        List<String> list = new ArrayList();
         int i = 0, start = 0;
         boolean match = false;
         boolean lastMatch = false;

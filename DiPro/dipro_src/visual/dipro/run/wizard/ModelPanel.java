@@ -46,11 +46,11 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import parser.ast.ModulesFile;
-import prism.PrismException;
+//import prism.PrismException;
 import prism.PrismLangException;
 import prism.UndefinedConstants;
 import dipro.run.Config;
-import dipro.run.Registry;
+//import dipro.run.Registry;
 
 class ModelPanel extends PartPanel {
 
@@ -157,25 +157,22 @@ class ModelPanel extends PartPanel {
 
 	}
 
-
+	// Finds the undefined constants of the constant panel
 	class ModelConstPanel extends ConstPanel {
-
 		private UndefinedConstants modelUnConst;
 
 		public ModelConstPanel() {
 			super("Model Constants");
 		}
-
+		// Fills the tables with constants
 		public void fillTables() {
 			ExperimentSetup setup = ExperimentSetup.getInstance();
 			if (getConfig().propFile == null)
 				modelUnConst = new UndefinedConstants(m_modulesFiles, null);
 			else
-				modelUnConst = new UndefinedConstants(m_modulesFiles,
-						getConfig().propFile);
+				modelUnConst = new UndefinedConstants(m_modulesFiles, getConfig().propFile);
 			for (int i = 0; i < modelUnConst.getMFNumUndefined(); i++) {
-				modelTableConst.addConstant(modelUnConst.getMFUndefinedName(i),
-						modelUnConst.getMFUndefinedType(i), "");
+				modelTableConst.addConstant(modelUnConst.getMFUndefinedName(i),modelUnConst.getMFUndefinedType(i), "");
 			}
 
 			setup.enableNext();

@@ -575,7 +575,7 @@ public class FastDateFormat extends Format {
      */
     protected List parsePattern() {
         DateFormatSymbols symbols = new DateFormatSymbols(mLocale);
-        List rules = new ArrayList();
+        List<Rule> rules = new ArrayList();
 
         String[] ERAs = symbols.getEras();
         String[] months = symbols.getMonths();

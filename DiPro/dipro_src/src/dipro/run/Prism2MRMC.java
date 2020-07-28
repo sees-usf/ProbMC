@@ -43,7 +43,7 @@ public class Prism2MRMC {
 		String cf;
 		
 		if(args.length<3) {
-			System.out.println("Parameters: model_file properties_file property_index [constants_file]");
+			System.out.println("Parameters: model_file properties_ file property_index [constants_file]");
 			System.exit(0);
 		}
 		

@@ -45,6 +45,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 
 import parser.ast.Expression;
+import parser.type.Type;
 
 public abstract class ConstPanel extends JPanel {
 
@@ -88,17 +89,17 @@ public abstract class ConstPanel extends JPanel {
 		modelTableConst.fireTableDataChanged();
 	}
 
-	Object parseValue(int type, String constValue) {
-		switch (type) {
-		case Expression.INT:
+	//Determines what type the constant is
+	Object parseValue(Type type, String constValue) {
+		String typeString = type.getTypeString();
+		if (typeString == "int")
 			return new Integer(constValue);
-		case Expression.DOUBLE:
+		else if (typeString == "double")
 			return new Double(constValue);
-		case Expression.BOOLEAN:
+		else if (typeString == "bool")
 			return new Boolean(constValue);
-		default:
+		else 
 			return constValue;
-		}
 	}
 }
 
@@ -112,7 +113,7 @@ class ConstTableModel extends AbstractTableModel implements TableModelListener {
 		addTableModelListener(this);
 	}
 
-	public void addConstant(String name, int type, Object value) {
+	public void addConstant(String name, Type type, Object value) {
 		addConstant(new Constant(name, type, value));
 	}
 
@@ -142,22 +143,15 @@ class ConstTableModel extends AbstractTableModel implements TableModelListener {
 		return false;
 	}
 
+	//Fills in the table of constants
 	public Object getValueAt(int rowIndex, int columnIndex) {
+		Expression e;  
 		Constant c = (Constant) listConstants.get(rowIndex);
 		switch (columnIndex) {
 		case 0:
 			return c.name;
 		case 1: {
-			switch (c.type) {
-			case Expression.INT:
-				return "int";
-			case Expression.DOUBLE:
-				return "double";
-			case Expression.BOOLEAN:
-				return "boolean";
-			default:
-				return "";
-			}
+			return c.type.getTypeString();
 		}
 		case 2:
 			return c.value.toString();
@@ -223,17 +217,17 @@ class ConstTableModel extends AbstractTableModel implements TableModelListener {
 
 	class Constant {
 		String name;
-		int type;
+		Type type;
 		Object value;
 		boolean unDef;
 
-		public Constant(String name, int type, Object value) {
-			this(name, type, value, true);
+		public Constant(String name, Type type2, Object value) {
+			this(name, type2, value, true);
 		}
 
-		public Constant(String name, int type, Object value, boolean unDef) {
+		public Constant(String name, Type type2, Object value, boolean unDef) {
 			this.name = name;
-			this.type = type;
+			this.type = type2;
 			this.value = value;
 			this.unDef = unDef;
 		}

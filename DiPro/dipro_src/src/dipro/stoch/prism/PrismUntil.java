@@ -29,6 +29,7 @@
 //	
 //==============================================================================
 
+//Focuses on the bounded feature of PRISM
 package dipro.stoch.prism;
 
 import java.io.File;
@@ -51,25 +52,24 @@ import parser.ast.ExpressionUnaryOp;
 import parser.ast.ExpressionVar;
 import parser.ast.LabelList;
 import prism.PrismException;
-import simulator.SimulatorException;
+//import simulator.SimulatorException;
 import dipro.graph.Vertex;
 import dipro.stoch.StochUntil;
 import dipro.util.DiProException;
 import dipro.util.Safety;
-
+//Focuses on the Until function of PRISM and how to deal with that
 public class PrismUntil implements StochUntil {
 
 	protected ExpressionProb formula;
 	protected PrismModel model;
 
-	PrismUntil(PrismModel pm, ExpressionProb formula) throws PrismException,
-			SimulatorException {
+	PrismUntil(PrismModel pm, ExpressionProb formula) throws PrismException {
 		this.model = pm;
 		this.formula = formula;
 	}
 
-	public static PrismUntil loadProperty(PrismModel pm, int propertyIndex)
-			throws DiProException, PrismException, SimulatorException {
+	//Loads the properties from the properties file
+	public static PrismUntil loadProperty(PrismModel pm, int propertyIndex) throws DiProException, PrismException {
 		Expression f = pm.propertiesFile().getProperty(propertyIndex);
 		if(!isSupportedProperty(f)) {
 			throw new DiProException("The property is not supported: " + f);
@@ -77,8 +77,7 @@ public class PrismUntil implements StochUntil {
 		ExpressionProb formula = (ExpressionProb) f;
 		PrismUntil property;
 			
-		ExpressionTemporal pathFormula = (ExpressionTemporal) formula
-				.getExpression();
+		ExpressionTemporal pathFormula = (ExpressionTemporal) formula.getExpression();
 		
 		int op = pathFormula.getOperator();
 		assert op == ExpressionTemporal.P_U;
@@ -88,6 +87,7 @@ public class PrismUntil implements StochUntil {
 		} else {
 			property = new PrismUntil(pm, formula);
 		}
+		System.out.println("PrismUntil - loadProperty");
 		return property;
 	}
 
@@ -113,7 +113,7 @@ public class PrismUntil implements StochUntil {
 			}
 		}
 		if(formula.getFilter() != null){
-			return formula.getFilter().noRequests();
+			return formula.getFilter().minRequested();
 		}
 		return true;
 	}
@@ -184,6 +184,7 @@ public class PrismUntil implements StochUntil {
 
 	public int check(Vertex vertex) {
 		PrismState s = (PrismState) vertex;
+		System.out.println("check - PrismUntil");
 		try {
 			boolean a = evaluate(phi1(), s);
 			boolean b = evaluate(phi2(), s);
@@ -208,7 +209,7 @@ public class PrismUntil implements StochUntil {
 	protected boolean evaluate(Expression phi, Values varValues)
 			throws PrismException, DiProException {
 		// This function is only defined for boolean expressions.
-		assert phi.getType() == Expression.BOOLEAN;
+		//assert phi.getType() == Expression.BOOLEAN;
 		boolean value;
 		if (phi instanceof ExpressionUnaryOp) {
 			int op = ((ExpressionUnaryOp) phi).getOperator();
@@ -264,14 +265,15 @@ public class PrismUntil implements StochUntil {
 				|| phi instanceof ExpressionLiteral
 				|| phi instanceof ExpressionFunc
 				|| phi instanceof ExpressionVar) {
+			System.out.println("Other things- evaluate - PRISMUNTIL");
 			value = phi.evaluateBoolean(model.constantValues(), varValues);
 			return value;
 		}
 		if (phi instanceof ExpressionLabel) {
-			int i = prismModel().propertiesFile().getLabelList().getLabelIndex(
-					((ExpressionLabel) phi).getName());
-			Expression expr = prismModel().propertiesFile().getLabelList()
-					.getLabel(i);
+			System.out.println("Properties - -  - " + prismModel().propertiesFile().getLabelList());
+			//System.out.println("Expression Label - PrismUntil" + prismModel().propertiesFile().getLabelList().size() + ((ExpressionLabel) phi).getName());
+			int i = prismModel().propertiesFile().getLabelList().getLabelIndex(((ExpressionLabel) phi).getName());
+			Expression expr = prismModel().propertiesFile().getLabelList().getLabel(i); 
 			Object o = evaluate(expr, varValues);
 			value = (Boolean) o;
 			return value;

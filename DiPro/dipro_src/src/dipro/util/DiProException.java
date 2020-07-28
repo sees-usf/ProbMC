@@ -31,6 +31,8 @@
 
 package dipro.util;
 
+
+//Creates an exception
 public class DiProException extends Exception {
 
 	public DiProException() {

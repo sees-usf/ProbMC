@@ -54,6 +54,7 @@ public class GraphContext extends AbstractContext {
 
 	protected String dirName = null;
 
+	//Constructor
 	protected GraphContext(int id, Config config) throws Exception {
 		super(id, config);
 	}
@@ -77,6 +78,7 @@ public class GraphContext extends AbstractContext {
 			prop.add(Integer.parseInt(line));
 			line = in.readLine();
 		}
+		in.close();
 		return prop;
 	}
 

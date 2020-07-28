@@ -36,6 +36,7 @@ import java.util.Iterator;
 import parser.ast.ModulesFile;
 import prism.PrismCL;
 import prism.PrismFileLog;
+import prism.ModelType;
 import dipro.stoch.CTMC;
 import dipro.stoch.MarkovModel;
 import dipro.stoch.UniformCTMC;
@@ -49,6 +50,7 @@ public class PrismDefaultContext extends AbstractPrismContext {
 	private PreparedDataFromPrism preparedDataFromPrism;
 	protected String modelFileName;
 
+	//Constructor
 	protected PrismDefaultContext(int id, Config config) throws Exception {
 		super(id, config);
 		// modelFileName = null;
@@ -65,6 +67,7 @@ public class PrismDefaultContext extends AbstractPrismContext {
 	 * @param preparedData
 	 *            contains the data which has already been prepared by PRISM
 	 */
+	//Uses PreparedDataFromPrism class to get the data from the files loaded
 	public void takePreparedDataFromPrism(PreparedDataFromPrism preparedData) {
 		preparedDataFromPrism = preparedData;
 		prismMainLog = preparedData.getMainLog();
@@ -76,12 +79,14 @@ public class PrismDefaultContext extends AbstractPrismContext {
 	}
 
 	@Override
+	//Loads the model for experiment
 	protected void loadModel() throws Exception {
-		if (config.getPrismMainLog() == null)
+		//Creates Logs
+		if (config.getPrismMainLog() == null) 
 			prismMainLog = new PrismFileLog(propFileName + ".prism.main.log");
-		else
+		else 
 			prismMainLog = config.getPrismMainLog();
-		if (config.getPrismTechLog() == null)
+		if (config.getPrismTechLog() == null) 
 			prismTechLog = new PrismFileLog(propFileName + ".prism.tech.log");
 		else
 			prismTechLog = config.getPrismTechLog();
@@ -91,16 +96,18 @@ public class PrismDefaultContext extends AbstractPrismContext {
 			propIndex = config.getPropId();
 			modelFileName = config.getModelName();
 			propFileName = config.getPropName();
-		
 		}
 		if (propIndex == -1) {
 			property = new UntilFalseProperty();
 		} else {
 			property = PrismUntil.loadProperty(prismModel, propIndex);
 		}
+		
 		if (config.mc)
 			performModelChecking();
+
 		if (graph instanceof CTMC) {
+
 			/*
 			 * Uniformisation will be done if XBF is used and the usePi flag is
 			 * set.
@@ -114,7 +121,8 @@ public class PrismDefaultContext extends AbstractPrismContext {
 				graph = new UniformCTMC((CTMC) graph, config.uniformRate);
 			}
 		}
-		start = ((MarkovModel) graph).getInitialState();
+
+		start = ((MarkovModel) graph).getInitialState();		
 	}
 
 	@Override

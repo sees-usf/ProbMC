@@ -48,7 +48,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 
 import parser.Values;
-import parser.ast.ModulesFile;
 import prism.Prism;
 import prism.PrismFileLog;
 import dipro.run.Config;
@@ -257,14 +256,14 @@ public class ExperimentSetup extends JDialog {
 
 		if (!excp) {
 			String type = "";
-			switch (m_config.getModel().getType()) {
-			case ModulesFile.STOCHASTIC:
-				type = "csl";
-				break;
-			case ModulesFile.PROBABILISTIC:
-			case ModulesFile.NONDETERMINISTIC:
-				type = "pctl";
-				break;
+			switch (m_config.getModel().getModelType()) {
+				case CTMC:
+					type = "csl";
+					break;
+				case LTS:
+				case DTMC:
+					type = "pctl";
+					break;
 			}
 
 			m_config.parameters = config.parameters;

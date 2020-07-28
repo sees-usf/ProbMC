@@ -32,7 +32,7 @@
 package dipro.vis.jung;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
+//import java.awt.Graphics2D;
 
 import dipro.graph.DirectedEdge;
 

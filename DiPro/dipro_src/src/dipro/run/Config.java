@@ -65,6 +65,7 @@ public class Config {
 	public static final String DEFAULT_SOLUTION_FILE_NAME = "dipro_sol.txt";
 	public static final String DEFAULT_SEARCH_LOG_NAME = "dipro_search.log";
 	
+	//
 	public static final int BF = 1;
 	public static final int BF_STAR = 2;
 	public static final int XBF = 11;
@@ -197,16 +198,14 @@ public class Config {
 		pruneBound = Double.parseDouble(configFile.getProperty("pruneBound"));
 		logLevel = Integer.parseInt(configFile.getProperty("logLevel"));
 		report = Boolean.parseBoolean(configFile.getProperty("report"));
-		isInStepByStepModus = Boolean.parseBoolean(configFile
-				.getProperty("isInStepByStepModus"));
+		isInStepByStepModus = Boolean.parseBoolean(configFile.getProperty("isInStepByStepModus"));
 		complete = Boolean.parseBoolean(configFile.getProperty("complete"));
 		mc = Boolean.parseBoolean(configFile.getProperty("mc"));
 		kxsol = Boolean.parseBoolean(configFile.getProperty("kxsol"));
 		mcsol = Integer.parseInt(configFile.getProperty("mcsol"));
 		mrmcsol = Boolean.parseBoolean(configFile.getProperty("mrmcsol"));
 		reportName = configFile.getProperty("reportName");
-		onlineVisualization = Boolean.parseBoolean(configFile
-				.getProperty("onlineVisualization"));
+		onlineVisualization = Boolean.parseBoolean(configFile.getProperty("onlineVisualization"));
 		cxIncrementRatio = Double.parseDouble(configFile.getProperty("cxIncrementRatio"));
 		solutionTrace = Integer.parseInt(configFile.getProperty("solutionTrace"));
 		isVisualizationEnabled = Boolean.parseBoolean(configFile.getProperty("isVisualizationEnabled"));
@@ -267,7 +266,7 @@ public class Config {
 		onlineVisualization = true;
 		cxIncrementRatio = 1.2;
 		solutionTrace = -1;
-		String srcName = "etc"+File.separator+"colorscale_blue_256.txt";
+		String srcName =  File.separator + "colorscale_blue_256.txt";
 		URL url = ClassLoader.getSystemResource(srcName);
 		if (url == null) {
 			Registry.getMain().handleFatalError("Failed to load color scale file: "+ srcName, 

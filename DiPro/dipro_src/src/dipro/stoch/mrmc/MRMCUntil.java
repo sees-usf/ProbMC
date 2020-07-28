@@ -140,6 +140,7 @@ public class MRMCUntil implements StochUntil {
 		System.out.println("prob. bound = "+probBound);
 		System.out.println("phi1 = "+phi1);
 		System.out.println("phi2 = "+phi2);
+		input.close();
 		if(timeBound<0) {
 			return new MRMCUntil(formula, comparisionOP, probBound, phi1, phi2);
 		}

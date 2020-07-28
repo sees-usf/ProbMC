@@ -134,15 +134,16 @@ public class BF extends Observable {
 	}
 
 	public void init() throws Exception {
+		System.out.println("init - BF");
 		Heuristic h = context.loadHeuristic(this);
 		SolutionCollector sc = context.createSolutionCollector(this);
-		this.init(context.getGraph(), context.getStart(),
-				context.getProperty(), h, sc);
+		this.init(context.getGraph(), context.getStart(), context.getProperty(), h, sc);
 	}
 
+	// Initializes values w/ parameters
 	public void init(DirectedGraph graph, Vertex start, Proposition property,
-			Heuristic heuristic, SolutionCollector solutionCollector)
-			throws Exception {
+			Heuristic heuristic, SolutionCollector solutionCollector) throws Exception {
+		System.out.println("init2 - BF");
 		reset();
 		this.graph = graph;
 		this.start = start;
@@ -152,12 +153,15 @@ public class BF extends Observable {
 		// evaluationFunction = createEvaluationFunction();
 		searchTree = createExploredSpace();
 		exploredGraph = new ExploredGraph();
+		System.out.println("Num Edges: " +  searchTree.numEdges() + " Num Vertices: " + searchTree.numVertices());
 		this.solutionCollector = solutionCollector;
 		arrangeGraph();
+		System.out.println("after arrangeGraph Num Edges: " +  searchTree.numEdges() + " Num Vertices: " + searchTree.numVertices());
 		setStatus(READY);
 		notifyObservers();
 	}
 
+	// Resets everything to an initial value
 	protected void reset() throws Exception {
 		offTime = 0l;
 		endTimePoint = -1l;
@@ -186,6 +190,7 @@ public class BF extends Observable {
 		graph = null;
 	}
 
+	//
 	protected void arrangeGraph() throws Exception {
 		if (start == null)
 			return;
@@ -196,7 +201,7 @@ public class BF extends Observable {
 				log("Start vertex pruned " + sMark);
 		} else {
 			searchTree.open(sMark);
-			exploredGraph.addVertex(start);
+			exploredGraph.addVertex(start); 
 		}
 	}
 
@@ -207,8 +212,11 @@ public class BF extends Observable {
 		startTimePoint = System.currentTimeMillis();
 		setStatus(RUNNING);
 		notifyObservers();
+		System.out.println("in execute - BF");
 		search();
+		System.out.println(" after search - BF");
 		terminate();
+		System.out.println("after terminate - BF");
 		if (getConfig().logLevel >= Config.ALG_LOG_BASIC) {
 			log("Summary \n" + "======= \n" + getSummaryReport());
 		}
@@ -217,7 +225,9 @@ public class BF extends Observable {
 	protected final void search() throws Exception {
 		if (getConfig().logLevel >= Config.ALG_LOG_BASIC)
 			log("Search started ...");
+		System.out.println("\nsearch - BF");
 		searchUntil();
+		System.out.println("\nafter searchUntil - BF");
 		if (getConfig().logLevel >= Config.ALG_LOG_BASIC) {
 			log("Search ended.");
 			if (isSearchCompleted()) {
@@ -235,14 +245,19 @@ public class BF extends Observable {
 	 */
 	protected void searchUntil() throws Exception {
 		while (!searchTree.isOpenEmpty()) {
+			System.out.println("\nIteration: "+ getNumIterations()+ "\nNumEdges: " + searchTree.numEdges() + " Num Vertices: " + searchTree.numVertices());
 			if (shouldTerminate()) {
+				System.out.println("SearchUntil - BF- Should terminate");
 				if (getConfig().logLevel >= Config.ALG_LOG_BASIC)
 					log("Algorithm should terminate.");
 				return;
 			}
 			demandForResume();
+			System.out.println("SearchUntil - BF-  after Demands for Resume - Iteration Count : " + getNumIterations());
 			doOneIteration();
+			System.out.println("SearchUntil - BF- after doOneIteration -  Iteration Count: " + getNumIterations());
 			iterationDone();
+			System.out.println("SearchUntil - BF- after iterationDone - Iteration Count:" + getNumIterations());
 			if (getConfig().isInStepByStepModus) {
 				setStatus(PAUSED);
 				notifyObservers();
@@ -262,23 +277,30 @@ public class BF extends Observable {
 	 * @throws Exception
 	 */
 	protected final void doOneIteration() throws Exception {
-		iterations++;
+		iterations++; // Increments iteration @ beginning
 		if (getConfig().logLevel >= Config.ALG_LOG_DEBUG)
 			log("Search Iteration " + iterations);
 		// remove a vertex with minimum distance from the source
 		SearchMark uMark = searchTree.getOptimalOpen();
+		System.out.println("after getOptimalOpen\n");
 		vertexToExpand(uMark);
+		System.out.println("after vertexToExpand\n");
+		
 		if (shouldExpand(uMark)) {
+			System.out.println("doOneIteration after shouldExpand - BF - Iteration Count: " + getNumIterations());
 			Vertex u = uMark.vertex();
+			
 			// examine all the neighbors of u and update their distances
 			Iterator<? extends DirectedEdge> iter = getOutgoingEdges(u);
+			System.out.println("in doOneIteration Num Edges: " +  searchTree.numEdges() + " Num Vertices: " + searchTree.numVertices());
 			while (iter.hasNext()) { // while u has more edges
+				System.out.println("u has more edges");
 				DirectedEdge uv = iter.next();
 				Vertex v = uv.target();
 				RelaxationInfo relax = relax(uMark, uv, v);
 				handleRelaxation(relax);
 			}
-			vertexExpanded(uMark);
+			vertexExpanded(uMark); // Prints stuff to log if condition is true
 		} else {
 			if (getConfig().logLevel >= Config.ALG_LOG_DETAILED)
 				log("Excluded from expansion: " + uMark.v + ", Distance= "
@@ -286,16 +308,18 @@ public class BF extends Observable {
 		}
 	}
 
+	// Checks for Outgoing Edges
 	@SuppressWarnings("unchecked")
 	public Iterator<? extends DirectedEdge> getOutgoingEdges(Vertex vertex) {
 		SearchMark mark = searchTree.isExplored(vertex);
-		Iterator<? extends DirectedEdge> iter = (Iterator<DirectedEdge>) getGraph()
-				.outgoingEdges(vertex);
+		System.out.println("getOutgoignEdges - Mark to string - BF: " + mark.toString());
+		Iterator<? extends DirectedEdge> iter = (Iterator<DirectedEdge>) getGraph().outgoingEdges(vertex);
 		iter = processOutgoingEdges(mark, iter);
 		return iter;
 	}
 
 	protected void iterationDone() throws Exception {
+		 System.out.println("In Iteration Done - BF");
 		setChanged();
 		notifyObservers();
 		report();
@@ -376,8 +400,11 @@ public class BF extends Observable {
 		endTimePoint = System.currentTimeMillis();
 		setStatus(TERMINATED);
 		notifyObservers();
+		System.out.println("terminate - BF");
 		if (solutionCollector != null) {
-			solutionCollector.commit();
+			System.out.println("solutionCollector - BF");
+			//solutionCollector.commit();
+			System.out.println("solutionCollector - BF");
 			report();
 		}
 		if (getConfig().logLevel >= Config.ALG_LOG_BASIC)
@@ -391,11 +418,15 @@ public class BF extends Observable {
 	}
 
 	public void cleanup() throws Exception {
+		System.out.println("cleanUp - BF");
 		if (getStatus() == CLEANED_UP)
 			return;
+		
 		if (getStatus() != TERMINATED)
 			terminate();
+		System.out.println("cleanUp - BF - after terminate");
 		reset();
+		System.out.println("cleanUp - BF - after reset");
 		setStatus(CLEANED_UP);
 		notifyObservers();
 		if (getConfig().logLevel >= Config.ALG_LOG_NORMAL)
@@ -477,6 +508,7 @@ public class BF extends Observable {
 			super.notifyObservers();
 			stopCountingOffTime();
 		}
+		System.out.println("notifyObservers - BF");
 	}
 
 	public double computeTraceValue(Trace trace) throws Exception {
@@ -663,6 +695,7 @@ public class BF extends Observable {
 	 * @throws Exception
 	 */
 	protected boolean shouldExpand(SearchMark vMark) throws Exception {
+		System.out.println("should expand - BF");
 		/* < ForDebugging > */
 		if (comparator.compare(vMark.f(), getConfig().pruneBound) >= 0) {
 			System.out.println(vMark.f() + " must not be worse than "
@@ -671,17 +704,18 @@ public class BF extends Observable {
 		/* </ ForDebugging > */
 		assert comparator.compare(vMark.f(), getConfig().pruneBound) < 0;
 		int x = property.check(vMark.v);
+		System.out.println("shouldExpand - BF - after check");
 		switch (x) {
-		case Proposition.TRUE:
-			if (getConfig().logLevel >= 3)
-				log("Vertex should not be expanded because it is a target vertex: "
-						+ vMark.v);
-			return false;
-		case Proposition.NEVER:
-			if (getConfig().logLevel >= 3)
-				log("Vertex should not be expanded because it never leads to a target: "
-						+ vMark.v);
-			return false;
+			case Proposition.TRUE:
+				if (getConfig().logLevel >= 3)
+					log("Vertex should not be expanded because it is a target vertex: "
+							+ vMark.v);
+				return false;
+			case Proposition.NEVER:
+				if (getConfig().logLevel >= 3)
+					log("Vertex should not be expanded because it never leads to a target: "
+							+ vMark.v);
+				return false;
 		}
 		assert x == Proposition.FALSE;
 		return true;
@@ -720,6 +754,7 @@ public class BF extends Observable {
 	 * @throws Exception
 	 */
 	protected void vertexToExpand(SearchMark vMark) throws Exception {
+		System.out.println("vertexToExpand - BF");
 		Vertex v = vMark.vertex();
 		/*
 		 * < ForDebugging > if((v instanceof USRoadNode) &&
@@ -747,6 +782,7 @@ public class BF extends Observable {
 	 * @return ExploredSpace object to be used by the algorithm.
 	 */
 	protected SearchTree createExploredSpace() {
+		System.out.println("CreateExploredSpace -  BF");
 		return context.createExploredGraph(this);
 	}
 
@@ -774,7 +810,7 @@ public class BF extends Observable {
 		sb.append("Solution size =        \t " + getSolutionSize() + "\n");
 		sb.append("Solution basic traces =\t " + getNumSolutionTraces() + "\n");
 		
-		
+		System.out.println("getSummaryReport - BF");
 		if(((DefaultSolutionCollector)this.solutionCollector).getSolutionTraceRecorderType()==SolutionTracesRecorder.DIAG_PATH 
 				|| ((DefaultSolutionCollector)this.solutionCollector).getSolutionTraceRecorderType()==SolutionTracesRecorder.CX_XML_FILE)
 		{
@@ -795,6 +831,7 @@ public class BF extends Observable {
 	}
 
 	protected void report() throws Exception {
+		System.out.println("Report - BF");
 		if (context.isReporterEnabled()) {
 			startCountingOffTime();
 			computeMemory();

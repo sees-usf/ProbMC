@@ -36,7 +36,7 @@ import java.util.HashMap;
 
 import parser.ast.ModulesFile;
 import parser.ast.PropertiesFile;
-import prism.PrismLog;
+//import prism.PrismLog;
 import dipro.stoch.CTMC;
 import dipro.stoch.DTMC;
 import dipro.stoch.MDP;

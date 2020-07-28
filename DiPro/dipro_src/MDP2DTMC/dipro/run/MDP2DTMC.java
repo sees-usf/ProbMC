@@ -195,11 +195,12 @@ public class MDP2DTMC {
 					numStates++;
 					line = sta.readLine();
 				} catch(SQLException e) {
-					Registry.getMain().handleError(e);
+					Registry.getMain().handleError(e.toString());
 					conn = DriverManager.getConnection(url, user, password); 
 					stmt = conn.createStatement();
 				}
 			}
+			stmt.close();
 			sta.close();
 			Registry.getMain().out().println("States were imported");
 			Registry.getMain().out().println("Transition are being imported...");
@@ -221,7 +222,7 @@ public class MDP2DTMC {
 					numTransitions++;
 					line = tra.readLine();
 				} catch(SQLException e) {
-					Registry.getMain().handleError(e);
+					Registry.getMain().handleError(e.toString());
 					conn = DriverManager.getConnection(url, user, password); 
 					stmt = conn.createStatement();
 				}
@@ -240,14 +241,14 @@ public class MDP2DTMC {
 				try {
 					stmt.close();
 				} catch (SQLException e) {
-					Registry.getMain().handleError(e);
+					Registry.getMain().handleError(e.toString());
 				}
 			}
 			if(conn!=null) {
 				try {
 					conn.close();
 				} catch (SQLException e) {
-					Registry.getMain().handleError(e);
+					Registry.getMain().handleError(e.toString());
 				}
 			}
 		}	
@@ -265,7 +266,7 @@ public class MDP2DTMC {
 						try {
 							lock.wait(100000);
 						} catch (InterruptedException e) {
-							Registry.getMain().handleError(e);
+							Registry.getMain().handleError(e.toString());
 						}
 					}
 					if(!isLoading) return;
@@ -273,7 +274,7 @@ public class MDP2DTMC {
 						try {
 							Registry.getMain().tech().println("Loaded so far: "+numStates+" states and "+numTransitions+" transitions");
 						} catch (Exception e) {
-							Registry.getMain().handleError(e);
+							Registry.getMain().handleError(e.toString());
 						}
 					}
 				}
@@ -301,14 +302,14 @@ public class MDP2DTMC {
 				try {
 					stmt.close();
 				} catch (SQLException e) {
-					Registry.getMain().handleError(e);
+					//Registry.getMain().handleError(e);
 				}
 			}
 			if(conn!=null) {
 				try {
 					conn.close();
 				} catch (SQLException e) {
-					Registry.getMain().handleError(e);
+					//Registry.getMain().handleError(e);
 				}
 			}
 		}
@@ -328,7 +329,7 @@ public class MDP2DTMC {
 			stmt.executeUpdate(sql);
 			return true;
 		} catch (SQLException e) {
-			Registry.getMain().handleError(e);
+			Registry.getMain().handleError(e.toString());
 		} finally {
 			if(stmt!=null) {
 				try {
@@ -341,7 +342,7 @@ public class MDP2DTMC {
 				try {
 					conn.close();
 				} catch (SQLException e) {
-					Registry.getMain().handleError(e);
+					Registry.getMain().handleError(e.toString());
 				}
 			}
 		}
@@ -371,9 +372,12 @@ public class MDP2DTMC {
 					con+=tmp;
 				}
 			}
+			in.close();
+			
 		} catch (IOException e) {
-			Registry.getMain().handleError(e);
+			Registry.getMain().handleError(e.toString());
 		}
+
 		return con;
 	}
 	

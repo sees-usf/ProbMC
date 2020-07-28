@@ -124,7 +124,7 @@ public abstract class AbstractVisualizer extends Observable implements
 	 *            new state, close state, reopen state
 	 * @throws Exception
 	 */
-	@SuppressWarnings("unchecked")
+	//@SuppressWarnings("unchecked")
 	public void update(Observable observable, Object obj) {
 		assert alg == observable;
 		assert isOnline();

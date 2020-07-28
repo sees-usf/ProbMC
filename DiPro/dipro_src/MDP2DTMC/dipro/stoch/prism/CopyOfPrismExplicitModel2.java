@@ -6,7 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
+//import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,10 +15,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
+//import java.util.Set;
 import java.util.Vector;
 
-import parser.PrismParser;
+//import parser.PrismParser;
 import parser.Values;
 import parser.ast.Expression;
 import parser.ast.ModulesFile;
@@ -26,7 +26,7 @@ import parser.ast.PropertiesFile;
 import prism.Prism;
 import prism.PrismException;
 import simulator.SimulatorEngine;
-import dipro.alg.BF;
+//import dipro.alg.BF;
 import dipro.graph.Edge;
 import dipro.graph.OfflineStateSpace;
 import dipro.graph.State;
@@ -40,9 +40,9 @@ import dipro.stoch.MDP;
 import dipro.stoch.MarkovModel;
 import dipro.stoch.StochasticTransition;
 import dipro.stoch.prism.PrismModel;
-import dipro.stoch.prism.PrismRawModel;
-import dipro.stoch.prism.PrismState;
-import dipro.stoch.prism.PrismTransition;
+//import dipro.stoch.prism.PrismRawModel;
+//import dipro.stoch.prism.PrismState;
+//import dipro.stoch.prism.PrismTransition;
 
 public class CopyOfPrismExplicitModel2 extends OfflineStateSpace implements PrismModel {
 	
@@ -68,7 +68,7 @@ public class CopyOfPrismExplicitModel2 extends OfflineStateSpace implements Pris
 	protected Values constantValues;
 	protected int stateSize; 
 	protected int memory;
-	private boolean isLoading;
+	//private boolean isLoading;
 	
 	public CopyOfPrismExplicitModel2(PrismExplicitContext context) throws IOException, PrismException {
 		this.context = context;
@@ -78,7 +78,7 @@ public class CopyOfPrismExplicitModel2 extends OfflineStateSpace implements Pris
 		startState = null;
 		stateSize = -1;
 		memory = -1;
-		isLoading = false;
+		//isLoading= false;
 		load();
 		propertiesFile = prism.parsePropertiesFile(modulesFile, new File(
 				context.getPropFileName()));
@@ -94,7 +94,7 @@ public class CopyOfPrismExplicitModel2 extends OfflineStateSpace implements Pris
 	
 	protected void load() throws IOException, PrismException {
 		Registry.getMain().out().println("Explicit model is being loaded...");
-		isLoading = true;
+		//isLoading = true;
 		long time1 = System.currentTimeMillis();
 		prism = new Prism(context.getPrismMainLog(), context.getPrismTechLog());
 		modulesFile = prism.parseExplicitModel(new File(context.getStaFileName()), new File(context.getTraFileName()), new File(context.getLabFileName()), context.getModelType());
@@ -110,7 +110,7 @@ public class CopyOfPrismExplicitModel2 extends OfflineStateSpace implements Pris
 		time1 = System.currentTimeMillis() - time1;
 		Registry.getMain().out().println("Module file parsed; time = "+time1);
 		Registry.getMain().out().println("External state und transition files are being loaded...");
-		startLoadingWatcher();
+		//startLoadingWatcher();
 		long time2 = System.currentTimeMillis();
 		BufferedReader sta = new BufferedReader(new FileReader(context.getStaFileName()));
 		String line = sta.readLine();
@@ -178,7 +178,7 @@ public class CopyOfPrismExplicitModel2 extends OfflineStateSpace implements Pris
 			line = tra.readLine();
 		}
 		tra.close();
-		isLoading = false;
+		//isLoading = false;
 		time2 = System.currentTimeMillis() - time2;
 		Registry.getMain().out().println("Transitions were imported");
 		Registry.getMain().out().println("Time to load external files = "+time2);
@@ -300,7 +300,7 @@ public class CopyOfPrismExplicitModel2 extends OfflineStateSpace implements Pris
 
 	@Override
 	public Class getVertexLabelType(String label) throws Exception {
-		int type =startState.values.getType(startState.values.getIndexOf(label));
+		int type = startState.values.getType(startState.values.getIndexOf(label));
 		switch (type) {
 		case SimulatorEngine.BOOLEAN:
 			return Boolean.class;

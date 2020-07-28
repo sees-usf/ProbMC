@@ -64,7 +64,7 @@ public class DiagnosticPath {
 	private boolean isPriorityAnd;
 	private int id;
 
-	private String ignore;
+	//private String ignore;
 
 	public DiagnosticPath() {
 

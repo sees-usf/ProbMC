@@ -555,6 +555,7 @@ public class PrismExplicitModel extends OfflineStateSpace implements PrismModel 
 	}
 	@Override
 	public PropertiesFile propertiesFile() {
+		System.out.println("Properteies File");
 		return propertiesFile;
 	}
 

@@ -36,7 +36,7 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 
 import parser.ast.ModulesFile;
-import parser.ast.PropertiesFile;
+//import parser.ast.PropertiesFile;
 
 import dipro.run.Config;
 

@@ -237,21 +237,21 @@ public class AndOrTree {
 		// Object sibilingSep = new Object();
 		q.addLast(root);
 		q.add(levelSep);
-		int level = 0;
-		int levelCount = 0;
+		//int level = 0;
+		//int levelCount = 0;
 		while (!q.isEmpty()) {
 			Object o = q.removeFirst();
 			if (o instanceof Integer) {
 				System.out.println("--(" + o + ")--------------");
 			} else {
 				if (o == levelSep) {
-					level++;
-					levelCount = 0;
+					//level++;
+					//levelCount = 0;
 					if (!q.isEmpty())
 						q.addLast(o);
 					System.out.println();
 				} else {
-					levelCount++;
+					//levelCount++;
 					Node n = (Node) o;
 					System.out.print(n);
 					if (!n.children.isEmpty()) {

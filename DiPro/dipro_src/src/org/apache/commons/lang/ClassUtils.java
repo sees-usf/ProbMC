@@ -69,7 +69,7 @@ public class ClassUtils {
     /**
      * Maps primitive <code>Class</code>es to their corresponding wrapper <code>Class</code>.
      */
-    private static final Map primitiveWrapperMap = new HashMap();
+    private static final Map<Object, Object> primitiveWrapperMap = new HashMap();
     static {
          primitiveWrapperMap.put(Boolean.TYPE, Boolean.class);
          primitiveWrapperMap.put(Byte.TYPE, Byte.class);
@@ -88,8 +88,8 @@ public class ClassUtils {
     private static final Map wrapperPrimitiveMap = new HashMap();
     static {
         for (Iterator it = primitiveWrapperMap.keySet().iterator(); it.hasNext();) {
-            Class primitiveClass = (Class) it.next();
-            Class wrapperClass = (Class) primitiveWrapperMap.get(primitiveClass);
+            Class<?> primitiveClass = (Class<?>) it.next();
+            Class<?> wrapperClass = (Class<?>) primitiveWrapperMap.get(primitiveClass);
             if (!primitiveClass.equals(wrapperClass)) {
                 wrapperPrimitiveMap.put(wrapperClass, primitiveClass);
             }
@@ -288,7 +288,7 @@ public class ClassUtils {
         if (cls == null) {
             return null;
         }
-        List classes = new ArrayList();
+        List<Class> classes = new ArrayList<Class>();
         Class superclass = cls.getSuperclass();
         while (superclass != null) {
             classes.add(superclass);
@@ -315,7 +315,7 @@ public class ClassUtils {
             return null;
         }
 
-        List interfacesFound = new ArrayList();
+        List interfacesFound = new ArrayList<Class>();
         getAllInterfaces(cls, interfacesFound);
 
         return interfacesFound;
@@ -327,7 +327,7 @@ public class ClassUtils {
      * @param cls  the class to look up, may be <code>null</code>
      * @param interfacesFound the <code>Set</code> of interfaces for the class
      */
-    private static void getAllInterfaces(Class cls, List interfacesFound) {
+    private static void getAllInterfaces(Class cls, List<Class> interfacesFound) {
         while (cls != null) {
             Class[] interfaces = cls.getInterfaces();
 
@@ -360,7 +360,7 @@ public class ClassUtils {
         if (classNames == null) {
             return null;
         }
-        List classes = new ArrayList(classNames.size());
+        List<Class> classes = new ArrayList<Class>(classNames.size());
         for (Iterator it = classNames.iterator(); it.hasNext();) {
             String className = (String) it.next();
             try {
@@ -388,7 +388,7 @@ public class ClassUtils {
         if (classes == null) {
             return null;
         }
-        List classNames = new ArrayList(classes.size());
+        List classNames = new ArrayList<Class>(classes.size());
         for (Iterator it = classes.iterator(); it.hasNext();) {
             Class cls = (Class) it.next();
             if (cls == null) {
@@ -833,7 +833,7 @@ public class ClassUtils {
             return declaredMethod;
         }
 
-        List candidateClasses = new ArrayList();
+        List candidateClasses = new ArrayList<Class>();
         candidateClasses.addAll(getAllInterfaces(cls));
         candidateClasses.addAll(getAllSuperclasses(cls));
 

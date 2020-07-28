@@ -65,6 +65,7 @@ public class SearchTree implements DirectedGraph {
 	protected double bestFValue = -1.0d;
 
 	public SearchTree(BF alg) {
+		System.out.println("searchTreeConstructor - SearchTree");
 		this.alg = alg;
 		this.comparator = new DistanceComparator();
 		queue = new SelectionPriorityQueue<BF.SearchMark>(comparator);
@@ -108,7 +109,9 @@ public class SearchTree implements DirectedGraph {
 		return bestFValue;
 	}
 
+	// Returns a searchMark which is head of queue
 	public BF.SearchMark getOptimalOpen() {
+		System.out.println("getOptimalOpen - SearchTree(in DiPro.util)");
 		BF.SearchMark vMark = queue.peek();
 		assert vMark == null || vMark == open.get(vMark.vertex());
 		return vMark;
@@ -119,7 +122,7 @@ public class SearchTree implements DirectedGraph {
 		open.put(vMark.vertex(), vMark);
 		queue.offer(vMark);
 		assert isOpen(vMark.vertex()) == vMark;
-		maxOpenSize = Math.max(maxOpenSize, open.size());
+		maxOpenSize= Math.max(maxOpenSize, open.size());
 		if (bestFValue == -1.0d
 				|| comparator.compare(vMark.f(), bestFValue) < 0)
 			bestFValue = vMark.f();
@@ -215,7 +218,7 @@ public class SearchTree implements DirectedGraph {
 	}
 	
 
-	@SuppressWarnings("unchecked")
+	//@SuppressWarnings("unchecked")
 	public void setTreeEdge(BF.SearchMark vMark, DirectedEdge treeEdge) {
 //		Collection<DirectedEdge> c = (Collection<DirectedEdge>) vMark
 //				.get(INCOMING_EDGES_KEY);
@@ -303,7 +306,7 @@ public class SearchTree implements DirectedGraph {
 //		}
 //	}
 
-	@SuppressWarnings("unchecked")
+	//@SuppressWarnings("unchecked")
 	public DirectedEdge getTreeEdge(BF.SearchMark vMark) {
 		if (vMark.has(TREE_EDGE_KEY)) {
 //			assert vMark.has(INCOMING_EDGES_KEY);
@@ -626,7 +629,7 @@ public class SearchTree implements DirectedGraph {
 		throw new UnsupportedOperationException();
 	}
 
-	@SuppressWarnings("unchecked")
+	//@SuppressWarnings("unchecked")
 	public Class getVertexLabelType(String label) {
 		throw new UnsupportedOperationException();
 	}

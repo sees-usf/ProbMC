@@ -38,7 +38,7 @@ import parser.ast.Expression;
 import parser.ast.ExpressionProb;
 import parser.ast.ExpressionTemporal;
 import prism.PrismException;
-import simulator.SimulatorException;
+//import simulator.SimulatorException;
 import dipro.stoch.StochTBoundedUntil;
 import dipro.util.Safety;
 
@@ -47,12 +47,11 @@ public class PrismTBoundedUntil extends PrismUntil implements
 
 	private double timeBound; 
 	
-	PrismTBoundedUntil(PrismModel pm, ExpressionProb formula) throws PrismException,
-			SimulatorException {
+	PrismTBoundedUntil(PrismModel pm, ExpressionProb formula) throws PrismException{
 		super(pm, formula);
 		Expression expr = ((ExpressionTemporal)formula.getExpression()).getUpperBound();
 		assert expr != null;
-		Object result = expr.evaluate(model.constantValues(), null);
+		Object result = expr.evaluate(model.constantValues());
 		if(result instanceof Integer) {
 			timeBound = ((Integer)result).doubleValue();
 		}
@@ -71,7 +70,7 @@ public class PrismTBoundedUntil extends PrismUntil implements
 	}
 
 	/**
-	 * Creates the file containing the safety propery adopted to the solution
+	 * Creates the file containing the safety property adopted to the solution
 	 * delivered by the search algorithm. The file is stored under the name
 	 * given by {@link #dsgPropFileName}.
 	 * 

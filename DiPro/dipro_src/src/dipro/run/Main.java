@@ -29,6 +29,9 @@
 //	
 //==============================================================================
 
+
+
+//
 package dipro.run;
 
 import java.io.BufferedReader;
@@ -41,10 +44,12 @@ import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.LinkedList;
-
+import prism.Prism;
 import dipro.alg.BF;
 import dipro.util.DiProException;
 
+
+//Contains main function
 public class Main {
 
 	protected PrintStream out;
@@ -92,13 +97,14 @@ public class Main {
 			e.printStackTrace(System.err);
 			System.err.println("WARNING: System.err is used as a technical log stream");
 		}
-		/* ForDebugging */
+		// ForDebugging 
 		tech = System.err;
 	}
 	
+	//Loads manual if invalid parameters, otherwise starts up DiPro
 	public void start(String[] args) {
 		if (args.length == 0) {
-			out.println("Invalid parameters! Please, read the manual!");
+			System.out.println("Invalid parameters! Please, read the manual!");
 			try {
 				printManual();
 			} catch(IOException e) {
@@ -106,8 +112,7 @@ public class Main {
 			}
 			System.exit(0);
 		}
-		if (args.length == 1
-				&& (args[0].equals("--help") || args[0].equals("-help"))) {
+		if (args.length == 1&& (args[0].equals("--help") || args[0].equals("-help"))) {
 			try {
 				printManual();
 			} catch(IOException e) {
@@ -116,7 +121,7 @@ public class Main {
 			System.exit(0);
 		}
 		if (args.length == 2 && args[0].equals("-batch")) {
-			out.println("Run in batch mode...");
+			System.out.println("Run in batch mode...");
 			out.println("Batch file: " + args[1]);
 			out.println();
 			batchRun(args[1]);
@@ -145,6 +150,7 @@ public class Main {
 			System.out.println(line);
 			line = in.readLine();
 		}
+		in.close();
 	}
 	
 
@@ -255,6 +261,7 @@ public class Main {
 		run(params);
 	}
 
+	//Creates DiPro object and runs algorithm to find a counterexample
 	public void run(String[] params) {
 		experimentCounter++;
 		DiPro dipro = null;
@@ -268,12 +275,16 @@ public class Main {
 					+ " =========================================");
 			// out.println(formatParams(params));
 			context = dipro.loadContext(experimentCounter, config);
+			System.out.println("run - Main - after loadContext");
 			context.init();
+			System.out.println("run - Main - after context.init");
 			// out.println(config);
 			out.println(context);
 			try {
 				alg = context.loadAlgorithm();
+				System.out.println("run - Main - after loadAlgorithm");
 				alg.init();
+				System.out.println("run - Main - after alg.init");
 				out.println("Search using " + alg + " ...");
 //				if(alg.getHeuristic()!=null) {
 //					out.println("Heuristic " + alg.getHeuristic().getClass().getName());
@@ -282,12 +293,14 @@ public class Main {
 //					out.println("No heuristic is used.");
 //				}
 				alg.execute();
-				out.println(alg.getSummaryReport());
+				System.out.println("run - Main - after alg.execute");
+				//out.println(alg.getSummaryReport()); - Same thing in execute
 			} catch (Exception e) {
 				handleError("Experiment failed! ", e);
 			} finally {
 				if(alg != null) {
 					alg.cleanup();
+					System.out.println("run - Main - after alg cleanup");
 				}
 			}
 //			/* Just for QEST 2009 */
@@ -330,6 +343,7 @@ public class Main {
 			if(context != null) {
 				try {
 					context.cleanup();
+					System.out.println("run - Main - after context cleanup");
 				} catch (Exception e) {
 					handleError("Experiment failed! ", e);
 				}
@@ -385,8 +399,8 @@ public class Main {
 		exit(1);
 	}
 
-	public void handleError(String msg) {
-		handleError(msg, null);
+	public void handleError(String e) {
+		handleError(e, null);
 	}
 	public void handleError(String msg, Exception e) {
 		if(msg != null) out.println("ERROR: "+ msg);
@@ -414,8 +428,10 @@ public class Main {
 		tech.println("System is shut down.");
 		System.exit(code);
 	}
-
+	
+	//Main Function
 	public static void main(String[] args) {
+		Prism a;
 		Main main = new Main();
 		main.start(args);
 		main.exit(0);

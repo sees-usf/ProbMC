@@ -1,6 +1,5 @@
 //==============================================================================
-//	
-//	Copyright (c) 2008-
+//	//	Copyright (c) 2008-
 //
 //	Chair for Software Engineering - University of Konstanz
 //	Prof. Dr. Stefan Leue
@@ -58,11 +57,12 @@ import parser.ast.Module;
 import parser.ast.ModulesFile;
 import parser.ast.PropertiesFile;
 import prism.Prism;
+import prism.ModelType;
 import prism.PrismException;
 import prism.PrismLangException;
 import prism.UndefinedConstants;
 import simulator.SimulatorEngine;
-import simulator.SimulatorException;
+//import simulator.SimulatorException;
 import dipro.graph.Transition;
 import dipro.run.AbstractPrismContext;
 import dipro.run.PreparedDataFromPrism;
@@ -101,12 +101,12 @@ class PrismRawModel {
 	// Hashtable<String, String> labels = new Hashtable<String, String>();
 	Hashtable<String, String> subformulaeToLabels = new Hashtable<String, String>();
 
+	//Constructor
 	PrismRawModel(AbstractPrismContext context, PreparedDataFromPrism preparedData)
 	throws InvalidPropertiesFormatException, PrismException,
-	ParseException, IOException, SimulatorException {
+	ParseException, IOException{
 		this.context = context;
-		prism = new Prism(context.getPrismMainLog(), context
-				.getPrismTechLog());
+		prism = new Prism(context.getPrismMainLog(), context.getPrismTechLog());
 		prism.initialise();
 		if (context.getDiPro().isPlugin()) {
 			modulesFile = context.getConfig().getModel();
@@ -114,36 +114,41 @@ class PrismRawModel {
 			constantValues = context.getConfig().getConstantValues();
 			if(constantValues == null)
 				defineConstants();
-			
 		} else {
 			parseModel();
 		}
-		engine = new SimulatorEngine();
+		/*engine = new SimulatorEngine();
 		engine.startNewPath(modulesFile, propertiesFile, initValues());
 		int n = engine.getNumVariables();
 		variablesNames = new Vector<String>(n);
 		for (int i = 0; i < n; i++)
 			variablesNames.add(i, engine.getVariableName(i));
-		stateSize = calculateStateSize();
+		stateSize = calculateStateSize();*/
 	}
 	
+	//Constructor
 	PrismRawModel(AbstractPrismContext context)
 			throws InvalidPropertiesFormatException, PrismException,
-			ParseException, IOException, SimulatorException {
+			ParseException, IOException{
 		this(context, null);
 	}
+	
 
 	private void parseModel() throws PrismException, IOException {
+		System.out.println("\n\nparseModel - PrismRawModel");
 		if(context instanceof PrismDefaultContext) {
 			modulesFile = prism.parseModelFile(new File(((PrismDefaultContext)context).getModelFileName()));
 		}
 		else {
+			//Don't know what this does
 			PrismExplicitContext con = (PrismExplicitContext)context;
-			modulesFile = prism.parseExplicitModel(new File(con.getTraFileName()), new File(con.getStaFileName()), new File(con.getLabFileName()), con.getModelType());
+			modulesFile = prism.parseModelFile(new File(con.getStaFileName()));
+			//new File(con.getTraFileName()) new File(con.getStaFileName()), , con.getModelType() con.getLabFileName())
 		}
-		propertiesFile = prism.parsePropertiesFile(modulesFile, new File(
-				context.getPropFileName()));
-
+		propertiesFile = prism.parsePropertiesFile(modulesFile, new File(context.getPropFileName()));
+		
+		System.out.println(propertiesFile.getLabelList());
+		
 		/* load external constant values */
 		externalConstantValues = new Properties();
 		if (context.getConstFileName() != null) {
@@ -154,7 +159,7 @@ class PrismRawModel {
 		defineConstants();
 	}
 	
-	private int calculateStateSize() throws SimulatorException {
+	/*private int calculateStateSize() throws SimulatorException {
 		int size = 0;
 		for (int i = 0; i < variablesNames.size(); i++) {
 			int type = engine.getVariableType(i);
@@ -174,15 +179,15 @@ class PrismRawModel {
 			}
 		}
 		return size;
-	}
+	}*/
 
+	//Sets up to call other defineConstants function
 	private void defineConstants() throws PrismException {
-		constantValues = PrismRawModel.defineConstants(this.modulesFile,
-				this.propertiesFile, this.externalConstantValues);
+		constantValues = PrismRawModel.defineConstants(this.modulesFile,this.propertiesFile, this.externalConstantValues);
 	}
 
-	static Values defineConstants(ModulesFile mf, PropertiesFile pf,
-			Properties externalConstantValues) throws PrismException {
+	// Defines constants in the model file
+	static Values defineConstants(ModulesFile mf, PropertiesFile pf, Properties externalConstantValues) throws PrismException {
 		UndefinedConstants undefinedConstants = new UndefinedConstants(mf, pf);
 		int mfn = undefinedConstants.getMFNumUndefined();
 		for (int i = 0; i < mfn; i++) {
@@ -218,14 +223,16 @@ class PrismRawModel {
 //		float totalExitRate = -1.0f;
 		List<PrismTransition> outgoingTransitions = new LinkedList<PrismTransition>();
 		try {
-			engine.restartNewPath(s1.values());
-			int numUpdates = engine.getNumUpdates();
+			System.out.println("GenerateOutgoing Transitions - PrismRawModel");
+			//restartNewPath(s1.values());
+			engine.createNewPath();
+			int numUpdates = engine.getNumVariables();
 			for (int i = 0; i < numUpdates; i++) {
 				assert engine.getPathSize() == 1;
-				engine.manualUpdate(i);
+				engine.manualTransition(i);
 				Values v = getPathValues(1);
 				PrismState s2 = new PrismState(v);
-				engine.backtrack(0);
+				engine.backtrackTo(0);
 				PrismTransition trans = (PrismTransition) createTransition(s1,
 						s2);
 				fillTransition(trans, i);
@@ -234,16 +241,20 @@ class PrismRawModel {
 //				}
 				outgoingTransitions.add(trans);
 			}
-		} catch (SimulatorException e) {
-			Registry.getMain().handleFatalError("Prism Simulation Engine Failure!", e);
+		} finally {
+			return outgoingTransitions;
 		}
+		
+		
+		//catch (SimulatorException e) {
+			//Registry.getMain().handleFatalError("Prism Simulation Engine Failure!", e);
+		//}
 //		assert type() == ModulesFile.STOCHASTIC || totalExitRate == -1.0;
 //		if(type() == ModulesFile.STOCHASTIC) {
 //			for(PrismTransition t : outgoingTransitions) {
 //				t.transData.setSourceStateTotalExitRate(totalExitRate);
 //			}
 //		}
-		return outgoingTransitions;
 	}
 
 	PrismTransition createTransition(PrismState s1, PrismState s2) {
@@ -264,7 +275,7 @@ class PrismRawModel {
 	}
 
 	@SuppressWarnings("static-access")
-	protected Values getPathValues(int pathIndex) throws SimulatorException {
+	protected Values getPathValues(int pathIndex) {
 		Values v = new Values();
 		for (String varName : variablesNames) {
 			int j = engine.getIndexOfVar(varName);
@@ -288,8 +299,7 @@ class PrismRawModel {
 	}
 
 	@SuppressWarnings("static-access")
-	protected Transition fillTransition(PrismTransition trans, int updateIndex)
-			throws SimulatorException {
+	protected Transition fillTransition(PrismTransition trans, int updateIndex) {
 		String label = engine.getActionLabelOfUpdate(updateIndex);
 		String assigDescr = engine
 				.getAssignmentDescriptionOfUpdate(updateIndex);
@@ -308,6 +318,7 @@ class PrismRawModel {
 	}
 
 	PropertiesFile propertiesFile() {
+		System.out.println("properties File - Prism Raw Model");
 		return propertiesFile;
 	}
 
@@ -729,8 +740,10 @@ class PrismRawModel {
 	}
 		
 	void clear() {
+		System.out.println("clear - PrismRawModel ");
 		stateSize = -1;
-		variablesNames.clear();
+		//variablesNames.clear();
+		System.out.println("clear - PrismRawModel ");
 		variablesNames = null;
 		constantValues = null;
 		if (!context.getDiPro().isPlugin())
@@ -755,7 +768,7 @@ class PrismRawModel {
 		return variablesNames;
 	}
 
-	Class getVariableType(String varName) throws SimulatorException {
+	Class getVariableType(String varName){
 		int t = engine.getVariableType(engine.getIndexOfVar(varName));
 		switch (t) {
 		case SimulatorEngine.BOOLEAN:

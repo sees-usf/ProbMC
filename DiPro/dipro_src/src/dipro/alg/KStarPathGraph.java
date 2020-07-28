@@ -72,9 +72,9 @@ public class KStarPathGraph extends PathGraph {
 		return node.isComplete();
 	}
 
-	private DirectedEdge getEdge(PNode pNode) {
+	/*private DirectedEdge getEdge(PNode pNode) {
 		return pNode.edge();
-	}
+	}*/
 	private DirectedEdge getEdge(TreeHeapNode hNode) {
 		if(hNode.getClass()== HeapInNode.class) return ((HeapInNode)hNode).getElement();
 		if(hNode.getClass()== HeapTNode.class) return ((HeapTNode)hNode).getElement().getElement();

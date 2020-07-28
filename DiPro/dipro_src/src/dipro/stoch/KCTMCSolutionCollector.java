@@ -31,12 +31,12 @@
 
 package dipro.stoch;
 
-import java.io.BufferedReader;
+//import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+//import java.io.InputStreamReader;
+//import java.io.OutputStreamWriter;
 import java.io.PrintStream;
-import java.io.PrintWriter;
+///import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Iterator;
@@ -53,7 +53,7 @@ import dipro.graph.DirectedEdge;
 import dipro.graph.State;
 import dipro.graph.Vertex;
 import dipro.run.PrismDefaultContext;
-import dipro.run.Registry;
+//import dipro.run.Registry;
 import dipro.stoch.mrmc.MRMCModelChecker;
 import dipro.util.Trace;
 

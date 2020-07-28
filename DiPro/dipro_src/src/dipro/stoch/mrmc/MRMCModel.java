@@ -78,8 +78,7 @@ public class MRMCModel implements StateSpace {
 
 	private void init() throws IOException {
 		// read transitions
-		BufferedReader in = new BufferedReader(new FileReader(settings
-				.getTraFileName()));
+		BufferedReader in = new BufferedReader(new FileReader(settings.getTraFileName()));
 
 		String s = null;
 		s = in.readLine();
@@ -107,8 +106,7 @@ public class MRMCModel implements StateSpace {
 		}
 
 		// read labels
-		BufferedReader labFile = new BufferedReader(new FileReader(settings
-				.getLabFileName()));
+		BufferedReader labFile = new BufferedReader(new FileReader(settings.getLabFileName()));
 
 		s = labFile.readLine();
 		s = labFile.readLine();
@@ -138,6 +136,8 @@ public class MRMCModel implements StateSpace {
 			}
 			s = labFile.readLine();
 		}
+		labFile.close();
+		in.close();
 	}
 
 	public MarkovModel createMarkovModel() {

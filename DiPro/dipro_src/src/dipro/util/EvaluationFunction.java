@@ -33,7 +33,7 @@ package dipro.util;
 
 import dipro.alg.BF;
 import dipro.graph.DirectedEdge;
-import dipro.h.pattern.PatternHeuristicLength;
+//import dipro.h.pattern.PatternHeuristicLength;
 
 /**
  * @author aljazzar

@@ -34,12 +34,12 @@ package dipro.vis.jung;
 import java.awt.Paint;
 import java.awt.Shape;
 
-import javax.swing.Icon;
+//import javax.swing.Icon;
 
 import org.apache.commons.collections15.functors.ConstantTransformer;
 
 import dipro.graph.Vertex;
-import dipro.vis.gui.IconLoader;
+//import dipro.vis.gui.IconLoader;
 import edu.uci.ics.jung.visualization.util.VertexShapeFactory;
 
 public class JungVertexRealizer {

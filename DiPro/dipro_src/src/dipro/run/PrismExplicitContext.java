@@ -34,6 +34,7 @@ package dipro.run;
 import java.util.Iterator;
 
 import parser.ast.ModulesFile;
+import prism.ModelType;
 import prism.PrismFileLog;
 import dipro.stoch.CTMC;
 import dipro.stoch.MarkovModel;
@@ -46,13 +47,20 @@ import dipro.util.DiProException;
 public class PrismExplicitContext extends AbstractPrismContext {
 
 
+	private static final ModelType CTMC = null;
 	protected String traFileName, staFileName, labFileName;
 	protected int modelType;
 	protected String dbName;
 	
+	//Constructor
 	protected PrismExplicitContext(int id, Config config) throws Exception {
 		super(id, config);
-		modelType = ModulesFile.PROBABILISTIC;
+		ModulesFile m = null;
+		ModelType t = CTMC;
+		m.setModelType(t);
+		modelType = Integer.valueOf(m.getTypeString());
+		System.out.println(modelType + "  " + m.getTypeString());
+		//modelType = ModulesFile.PROBABLISTIC;
 	}
 	
 	public String getDatabaseName() {
@@ -109,9 +117,9 @@ public class PrismExplicitContext extends AbstractPrismContext {
 					String s = iter.next();
 					try {
 						modelType = Integer.parseInt(s);
-						if(	modelType != ModulesFile.PROBABILISTIC && 
-								modelType != ModulesFile.STOCHASTIC &&
-								modelType != ModulesFile.NONDETERMINISTIC) {
+						if(	modelType != ModuleFile.Probablistic && 
+								ModuleFile.stochastic &&
+								ModuleFile.nondeterministic) {
 							throw new DiProException("Invalid model type: " + modelType);
 						}
 						continue;

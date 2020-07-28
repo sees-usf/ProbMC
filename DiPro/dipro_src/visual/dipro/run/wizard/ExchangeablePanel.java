@@ -30,10 +30,10 @@
 //==============================================================================
 
 package dipro.run.wizard;
-import java.awt.Color;
+//import java.awt.Color;
 import java.util.ArrayList;
 
-import javax.swing.BorderFactory;
+//import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 public class ExchangeablePanel extends JPanel {

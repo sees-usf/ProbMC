@@ -67,6 +67,7 @@ public abstract class AbstractPrismContext extends AbstractContext {
 	protected Object modelCheckingResult;
 	protected PrismModel prismModel;
 
+	//Constructor
 	protected AbstractPrismContext(int id, Config config) throws Exception {
 		super(id, config);
 		// propIndex = config.propIndex;
@@ -76,40 +77,44 @@ public abstract class AbstractPrismContext extends AbstractContext {
 
 	public BF loadAlgorithm() throws Exception {
 		BF alg;
+		System.out.println("loadAlgorithm - abstractPrismContext");
 		switch (config.algType) {
-		case Config.XBF:
-			if (property instanceof StochTBoundedUntil) {
-				if (config.usePi) {
-					assert graph.getClass() == UniformCTMC.class;
-					alg = new PiXSearchCreator().createSearch(this);
+			case Config.XBF:
+				System.out.println("XBF");
+				if (property instanceof StochTBoundedUntil) {
+					if (config.usePi) {
+						assert graph.getClass() == UniformCTMC.class;
+						alg = new PiXSearchCreator().createSearch(this);
+					} else {
+						assert graph.getClass() != UniformCTMC.class;
+						if (graph.getClass() == CTMC.class) {
+							if (config.lengthHeuristic) {
+								alg = new ProbXSearchCreator().createSearch(this,
+										true);
+							} else {
+								alg = new ProbXSearchCreator().createSearch(this);
+							}
+	
+						} else {
+							alg = new StochXSearchCreator().createSearch(this);
+						}
+					}
 				} else {
 					assert graph.getClass() != UniformCTMC.class;
-					if (graph.getClass() == CTMC.class) {
-						if (config.lengthHeuristic) {
-							alg = new ProbXSearchCreator().createSearch(this,
-									true);
-						} else {
-							alg = new ProbXSearchCreator().createSearch(this);
-						}
-
-					} else {
-						alg = new StochXSearchCreator().createSearch(this);
-					}
+					alg = new ProbXSearchCreator().createSearch(this);
 				}
-			} else {
-				assert graph.getClass() != UniformCTMC.class;
-				alg = new ProbXSearchCreator().createSearch(this);
-			}
-			break;
-		case Config.K_STAR:
-			alg = new ProbKStarCreator().createSearch(this);
-			break;
-		case Config.EPPSTEIN:
-			alg = new ProbEppsteinCreator().createSearch(this);
-			break;
-		default:
-			throw new IllegalStateException("Invalid algorithm type : "
-					+ config.algType);
+				break;
+			case Config.K_STAR:
+				System.out.println("k-Star");
+				alg = new ProbKStarCreator().createSearch(this);
+				break;
+			case Config.EPPSTEIN:
+				System.out.println("Eppstein");
+				alg = new ProbEppsteinCreator().createSearch(this);
+				break;
+			default:
+				throw new IllegalStateException("Invalid algorithm type : "
+						+ config.algType);
 		}
 		if (config.report)
 			attachReporter(alg);
@@ -118,6 +123,7 @@ public abstract class AbstractPrismContext extends AbstractContext {
 
 	public SolutionCollector createSolutionCollector(BF alg) throws Exception {
 		SolutionCollector solutionCollector;
+		System.out.println("createSolutionCollector - AbstractPrismContext");
 		switch (config.algType) {
 		// case Config.BF:
 		// solutionCollector = new PrismXSolutionCollector(alg);

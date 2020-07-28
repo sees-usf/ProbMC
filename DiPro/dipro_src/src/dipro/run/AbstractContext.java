@@ -56,13 +56,14 @@ public abstract class AbstractContext implements Context {
 	protected AlgReporter reporter;
 	protected boolean isReporterEnabled;
 
+	// Constructor
 	public AbstractContext(int id, Config config) throws Exception {
 		this.id = id;
 		this.config = config;
 		this.reporter = null;
 		this.isReporterEnabled = false;
 		tStamp = System.currentTimeMillis();
-			readParameters();
+		readParameters();
 	}
 
 	/*
@@ -72,26 +73,29 @@ public abstract class AbstractContext implements Context {
 	 */
 	public void init() throws Exception {
 		loadModel();
-		if (config.mc)
-			performModelChecking();
+		System.out.println("Abstract Context - init");
+		/*
+		 * if (config.mc) performModelChecking();
+		 */
 	}
 
 	public int getId() {
 		return id;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see dipro.run.Context_#loadHeuristic(dipro.core.algo.BF)
 	 */
 	public Heuristic loadHeuristic(BF alg) throws Exception {
+		System.out.println("loadHeuristic - AbstractContext");
 		if (getConfig().heuristicName == null) {
+			System.out.println("Returned a null - AbstractContext");
 			return null;
 		}
 		Class<?> hClass = Class.forName(getConfig().heuristicName);
-		Constructor<?> c = hClass.getConstructor(new Class[] { Context.class,
-				BF.class });
+		Constructor<?> c = hClass.getConstructor(new Class[] { Context.class, BF.class });
 		Object h = c.newInstance(this, alg);
 		return (Heuristic) h;
 	}
@@ -99,11 +103,11 @@ public abstract class AbstractContext implements Context {
 	protected void attachReporter(BF alg) throws FileNotFoundException {
 		String reportFileName = getReportFileName();
 		// System.out.println("Report: "+reportFileName);
-		PrintStream repOut = new PrintStream(new FileOutputStream(
-				reportFileName));
+		PrintStream repOut = new PrintStream(new FileOutputStream(reportFileName));
 		AlgReporter reporter = new AlgReporter(alg, repOut);
-		/* The reporter can be either registered in the context 
-		 * or be run as a parallel thread.
+		/*
+		 * The reporter can be either registered in the context or be run as a parallel
+		 * thread.
 		 */
 		/* Register it in the context. */
 		this.reporter = reporter;
@@ -111,11 +115,11 @@ public abstract class AbstractContext implements Context {
 //		reporter.start();
 		isReporterEnabled = true;
 	}
-	
+
 	public boolean isReporterEnabled() {
 		return isReporterEnabled;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -188,7 +192,6 @@ public abstract class AbstractContext implements Context {
 		return config.getDiPro();
 	}
 
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -201,19 +204,21 @@ public abstract class AbstractContext implements Context {
 	public AlgReporter getAlgReporter() {
 		return reporter;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see dipro.run.Context_#cleanup()
 	 */
 	public void cleanup() throws Exception {
+		System.out.println("cleanup - AbstractContext - context cleanup");
 		if (graph == null) {
 			assert start == null;
 			assert property == null;
 			return;
 		}
 		graph.clear();
+		System.out.println("cleanup - AbstractContext - context cleanup");
 		graph = null;
 		start = null;
 		property = null;
@@ -251,6 +256,7 @@ public abstract class AbstractContext implements Context {
 	 * @see dipro.run.Context_#createExploredGraph(dipro.core.algo.BF)
 	 */
 	public SearchTree createExploredGraph(BF alg) {
+		System.out.println("createExploredGraph - AbstractContext");
 		return new SearchTree(alg);
 	}
 

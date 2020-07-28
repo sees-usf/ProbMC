@@ -178,6 +178,7 @@ public class PrismModelChecker implements ModelChecker {
 			}
 			line = reader.readLine();
 		}
+		reader.close();
 		return result;
 	}
 }

@@ -56,12 +56,13 @@ import javax.swing.ListSelectionModel;
 import parser.ast.Expression;
 import parser.ast.ModulesFile;
 import parser.ast.PropertiesFile;
+import parser.type.Type;
 import prism.PrismException;
 import prism.PrismLangException;
 import prism.UndefinedConstants;
 import dipro.run.Config;
 import dipro.run.Registry;
-import dipro.run.VisMain;
+//import dipro.run.VisMain;
 import dipro.stoch.prism.PrismUntil;
 
 class PropertyPanel extends PartPanel {
@@ -135,7 +136,7 @@ class PropertyPanel extends PartPanel {
 				int size = modelTable.getRowCount();
 				try {
 					String constName, constValue;
-					int type;
+					Type type;
 					for (int i = 0; i < size; i++) {
 						constName = modelTable.getConstant(i).name;
 						constValue = "" + modelTable.getConstant(i).value;
@@ -316,7 +317,7 @@ class PropertyPanel extends PartPanel {
 			int size = modelTable.getRowCount();
 			try {
 				String constName, constValue;
-				int type;
+				Type type;
 				for (int i = 0; i < size; i++) {
 					constName = modelTable.getConstant(i).name;
 					constValue = "" + modelTable.getConstant(i).value;
@@ -355,8 +356,8 @@ class PropertyPanel extends PartPanel {
 	boolean isValidConf() {
 		if (m_config.getProp() != null)
 			try {
-				m_config.getProp().semanticCheck(m_config.getModel(),
-						m_config.getProp());
+				//m_config.getProp().semanticCheck(m_config.getModel(), m_config.getProp());
+				m_config.getProp().tidyUp();
 			} catch (Exception e) {
 				listProp.cleanList();
 				m_config.setModel(null);

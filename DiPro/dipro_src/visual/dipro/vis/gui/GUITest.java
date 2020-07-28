@@ -139,7 +139,7 @@ public class GUITest extends JFrame {
 		FormLayout layout = new FormLayout("right:pref, 3dlu, 60dlu");
 		DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 
-		CellConstraints cc = new CellConstraints();
+		//CellConstraints cc = new CellConstraints();
 
 		builder.appendSeparator("General");
 		builder.append("Name", new JTextField("File V. 8"));

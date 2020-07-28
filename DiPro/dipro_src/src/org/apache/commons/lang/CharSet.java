@@ -80,7 +80,7 @@ public class CharSet implements Serializable {
      * Subclasses can add more common patterns if desired
      * @since 2.0
      */
-    protected static final Map COMMON = Collections.synchronizedMap(new HashMap());
+    protected static final Map<Object,Object> COMMON = Collections.synchronizedMap(new HashMap());
     
     static {
         COMMON.put(null, EMPTY);

@@ -145,8 +145,8 @@ public class ExtendedMessageFormat extends MessageFormat {
             toPattern = super.toPattern();
             return;
         }
-        ArrayList foundFormats = new ArrayList();
-        ArrayList foundDescriptions = new ArrayList();
+        ArrayList<Format> foundFormats = new ArrayList();
+        ArrayList<String> foundDescriptions = new ArrayList();
         StringBuffer stripCustom = new StringBuffer(pattern.length());
 
         ParsePosition pos = new ParsePosition(0);

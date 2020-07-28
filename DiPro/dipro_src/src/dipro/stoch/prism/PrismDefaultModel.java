@@ -44,7 +44,7 @@ import parser.ast.ModulesFile;
 import parser.ast.PropertiesFile;
 import prism.Prism;
 import prism.PrismException;
-import simulator.SimulatorException;
+//import simulator.SimulatorException;
 import dipro.graph.Edge;
 import dipro.graph.OnTheFlyStateSpace;
 import dipro.graph.State;
@@ -66,21 +66,22 @@ public class PrismDefaultModel extends OnTheFlyStateSpace implements PrismModel 
 
 	protected PrismState initState;
 
+	//Goes to other constructor
 	public PrismDefaultModel(AbstractPrismContext context)
 			throws InvalidPropertiesFormatException, PrismException,
-			ParseException, IOException, SimulatorException,
+			ParseException, IOException,
 			UnsupportedPropertyException {
 		this(context, null);
 	}
 
+	//Constructor
 	public PrismDefaultModel(AbstractPrismContext context, PreparedDataFromPrism preparedData)
 	throws InvalidPropertiesFormatException, PrismException,
-	ParseException, IOException, SimulatorException,
-	UnsupportedPropertyException {
+	ParseException, IOException, UnsupportedPropertyException {
 		this.context = context;
 		rawModel = new PrismRawModel(context, preparedData);
 		initState = new PrismState(rawModel.initValues());
-}
+	}
 	
 	public State getInitialState() {
 		return initState;
@@ -105,6 +106,7 @@ public class PrismDefaultModel extends OnTheFlyStateSpace implements PrismModel 
 	 * @see dipro.model.stoch.prism.PrismModelInterface#propertiesFile()
 	 */
 	public PropertiesFile propertiesFile() {
+		System.out.println("Properties FIle - Prism Default");
 		return rawModel.propertiesFile();
 	}
 
@@ -133,8 +135,9 @@ public class PrismDefaultModel extends OnTheFlyStateSpace implements PrismModel 
 	 * @see dipro.model.stoch.prism.PrismModelInterface#createMarkovModel()
 	 */
 	public MarkovModel createMarkovModel() {
-		switch (rawModel.type()) {
-		case ModulesFile.PROBABILISTIC:
+		System.out.println("Made CTMC for now -  createMarkovModel - PrismDefaultModel");
+		/*switch (rawModel.type()) {
+		case ModulesFile.modelType.PROBABILISTIC:
 			return new DTMC(this);
 		case ModulesFile.STOCHASTIC:
 			return new CTMC(this);
@@ -143,7 +146,8 @@ public class PrismDefaultModel extends OnTheFlyStateSpace implements PrismModel 
 		default:
 			throw new IllegalStateException("Unsupported model type: "
 					+ rawModel.type());
-		}
+		}*/
+		return new CTMC(this);
 	}
 
 	public Class getVertexLabelType(String label) throws SimulatorException {
@@ -196,6 +200,7 @@ public class PrismDefaultModel extends OnTheFlyStateSpace implements PrismModel 
 
 	@Override
 	public void clear() {
+		System.out.println("clear - PrismDefaultModel");
 		initState = null;
 		rawModel.clear();
 		System.gc();

@@ -43,15 +43,17 @@ import parser.ast.Expression;
 import parser.ast.ModulesFile;
 import parser.ast.PropertiesFile;
 import prism.Prism;
+import prism.ModelType;
 import prism.PrismFileLog;
 import prism.UndefinedConstants;
 import dipro.alg.BF;
-import dipro.h.pattern.PatternHeuristicProb;
 import dipro.stoch.prism.PrismUntil;
 import dipro.util.DiProException;
 import dipro.util.DiagnosticPath;
-import dipro.util.SolutionTracesRecorder;
+//import dipro.util.SolutionTracesRecorder;
 
+
+//For a Dipro object
 public class DiPro implements CXGenerator {
 
 	private PrintStream algLog;
@@ -70,13 +72,15 @@ public class DiPro implements CXGenerator {
 	// public Config loadConfig(String[] args){
 	// return loadConfig(args, null);
 	// }
-
+	
+	//Creates a configuration
 	public Config loadConfig(String[] args) {
 		Config config = parseArgs(args);
 		init(config);
 		if (config.logLevel > 0) {
 			getAlgLog().println("Configuration loaded \n" + config);
 		}
+		System.out.println("DiPro - loadConfig");
 		return config;
 	}
 
@@ -111,6 +115,7 @@ public class DiPro implements CXGenerator {
 		return relativeFilePath;
 	}
 
+	//Creates a context based on the model type
 	public Context loadContext(int id, Config config) throws Exception {
 		AbstractContext context = null;
 		switch (config.modelType) {
@@ -127,6 +132,7 @@ public class DiPro implements CXGenerator {
 		case Config.PRISM_EXPLICIT_MODEL:
 			// PrismContext con = new PrismContext(id, config);
 			// context = MDP2DTMC.convertToDTMC(con);
+			//has Problem
 			context = new PrismExplicitContext(id, config);
 			break;
 		case Config.MRMC_MODEL:
@@ -136,6 +142,7 @@ public class DiPro implements CXGenerator {
 			throw new IllegalArgumentException("Unsupported model type: "
 					+ config.modelType);
 		}
+		System.out.println("DiPro - loadContext");
 		return context;
 	}
 
@@ -147,6 +154,7 @@ public class DiPro implements CXGenerator {
 		algLog = m;
 	}
 
+	//Changes value of the Config object based off the args handed. 
 	protected Config parseArgs(String[] args) {
 		// protected Config parseArgs(String[] args, CounterExampleInformation
 		// info) {
@@ -159,12 +167,11 @@ public class DiPro implements CXGenerator {
 		// }
 		if (args.length > 0) {
 			for (int i = 0; i < args.length; i++) {
-				/* Check if string is argument flag */
+				// Check if string is argument flag 
 				String arg = args[i].trim();
 				if (arg.length() == 0)
 					continue;
 				if (arg.startsWith("-")) {
-
 					// Model Type
 					if (arg.equals("-prism")) {
 						config.modelType = Config.PRISM_MODEL;
@@ -194,7 +201,7 @@ public class DiPro implements CXGenerator {
 						// if(config.pruneBound>1.0d) config.pruneBound = 0.0d;
 						continue;
 					}
-
+					
 					// Model Options
 					if (arg.equals("-mc")) {
 						config.mc = true;
@@ -484,6 +491,7 @@ public class DiPro implements CXGenerator {
 			}
 		}
 		config.commit();
+		System.out.println("ParseArgs - DiPro");
 		return config;
 	}
 
@@ -523,7 +531,6 @@ public class DiPro implements CXGenerator {
 
 		try {
 			context = loadContext(0, config);
-
 			context.init();
 			try {
 				alg = context.loadAlgorithm();
@@ -562,15 +569,16 @@ public class DiPro implements CXGenerator {
 			throws DiProException {
 
 		ArrayList<Integer> supportedList = new ArrayList<Integer>();
-		switch (modelFile.getType()) {
+		switch (modelFile.getModelType()) {
 
-		case ModulesFile.STOCHASTIC:
+		case DTMC:
+		case CTMC:
 			supportedList.add(Config.XBF);
 			supportedList.add(Config.K_STAR);
 			supportedList.add(Config.EPPSTEIN);
 			break;
-		case ModulesFile.PROBABILISTIC:
-		case ModulesFile.NONDETERMINISTIC:
+		//case ModulesFile.PROBABILISTIC:
+		case LTS:
 			supportedList.add(Config.K_STAR);
 			supportedList.add(Config.EPPSTEIN);
 			break;
@@ -584,6 +592,7 @@ public class DiPro implements CXGenerator {
 	}
 
 	@Override
+	//Loads the properties from the property file
 	public ArrayList<Integer> loadProp(PropertiesFile propFile)
 			throws UnsupportedPropertyException {
 		ArrayList<Integer> supportedList = new ArrayList<Integer>();
@@ -601,17 +610,19 @@ public class DiPro implements CXGenerator {
 	}
 
 	private Object parseValue(int type, String constValue) {
+		Expression e;
 		switch (type) {
-		case Expression.INT:
+		case e.evaluateInt():
 			return new Integer(constValue);
-		case Expression.DOUBLE:
+		case (int)e.evaluateDouble():
 			return new Double(constValue);
-		case Expression.BOOLEAN:
+		case e.evaluateBoolean():
 			return new Boolean(constValue);
 		default:
 			return constValue;
 		}
 	}
+	
 
 	@Override
 	public void defineUnDefConst(HashMap<String, String> defParam)
@@ -626,14 +637,16 @@ public class DiPro implements CXGenerator {
 				for (int i = 0; i < unDefConst.getMFNumUndefined(); i++) {
 					constName = unDefConst.getMFUndefinedName(i);
 					constValue = defParam.get(constName);
-					type = unDefConst.getMFUndefinedType(i);
+					//type = unDefConst.getMFUndefinedType(i);
+					type = unDefConst.getMFNumUndefined();
 					unDefConst.defineConstant(constName,
 							"" + parseValue(type, constValue));
 				}
 				for (int i = 0; i < unDefConst.getPFNumUndefined(); i++) {
 					constName = unDefConst.getPFUndefinedName(i);
 					constValue = defParam.get(constName);
-					type = unDefConst.getPFUndefinedType(i);
+					//type = unDefConst.getPFUndefinedType(i);
+					type = unDefConst.getPFNumUndefined();
 					unDefConst.defineConstant(constName,
 							"" + parseValue(type, constValue));
 				}
@@ -662,7 +675,7 @@ public class DiPro implements CXGenerator {
 		Prism p = new Prism(new PrismFileLog("stdout"), new PrismFileLog(
 				"stdout"));
 		try {
-			PatternHeuristicProb ph = new PatternHeuristicProb();
+			//PatternHeuristicProb ph = new PatternHeuristicProb();
 
 			/*
 			 * //Constants for Airbag Model HashMap<String, String> unD = new
@@ -946,7 +959,7 @@ public class DiPro implements CXGenerator {
 			// config0.setHeuristicName("dipro.h.pattern.PatternHeuristic");
 			// config0.setLengthHeuristic(true);
 			// config0.setLogLevel(5);
-			ArrayList<DiagnosticPath> paths00 = dipro00.generateCX(0);
+			//ArrayList<DiagnosticPath> paths00 = dipro00.generateCX(0);
 
 			// ---- ORIGINAL EMBEDDED MODEL WITH HEURISTIC
 			ModulesFile mf1 = p.parseModelFile(new File(
@@ -970,7 +983,7 @@ public class DiPro implements CXGenerator {
 			config1.setReport(true);
 			config1.setReportName("experiments/embedded/Hembedded.report");
 			// config1.setReturnDiagnosticPaths(true);
-			ArrayList<DiagnosticPath> paths = dipro1.generateCX(0);
+			//ArrayList<DiagnosticPath> paths = dipro1.generateCX(0);
 
 			// File modelFile = new File("trainmodel/train_automaticmodel.pm");
 			// File propFile = new File("trainmodel/train_automaticmodel.csl");

@@ -31,10 +31,10 @@
 
 package dipro.stoch;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
+//import java.io.FileNotFoundException;
+//import java.io.FileOutputStream;
+//import java.io.IOException;
+//import java.io.PrintStream;
 import java.math.BigDecimal;
 
 import dipro.alg.BF;
@@ -222,7 +222,7 @@ public class PiEvaluationFunction extends BoundedDTMCEvaluationFunction {
 		return vPi;
 	}
 
-	private void plot(PiInterface pi) throws DiProException {
+	/*private void plot(PiInterface pi) throws DiProException {
 		long id = System.currentTimeMillis();
 		String fn = "transients" + id + ".txt";
 		try {
@@ -261,7 +261,7 @@ public class PiEvaluationFunction extends BoundedDTMCEvaluationFunction {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-	}
+	}*/
 
 	public void addParentPis(BF.SearchMark mark, BF.SearchMark markToAdd)
 	throws DiProException {
@@ -286,9 +286,9 @@ public class PiEvaluationFunction extends BoundedDTMCEvaluationFunction {
 		return new Pi(begin, end);
 	}
 	
-	private XBFpi alg() {
+/*	private XBFpi alg() {
 		return (XBFpi) alg;
-	}
+	}*/
 	
 	private UniformCTMC uCTMC() {
 		return (UniformCTMC) alg.getGraph();

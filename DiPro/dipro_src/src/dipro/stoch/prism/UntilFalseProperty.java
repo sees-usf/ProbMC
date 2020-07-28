@@ -37,12 +37,12 @@ import java.util.Collections;
 import parser.ast.Expression;
 import parser.ast.ExpressionProb;
 import prism.PrismException;
-import simulator.SimulatorException;
+//import simulator.SimulatorException;
 import dipro.graph.Vertex;
 
 public class UntilFalseProperty extends PrismUntil {
 
-	public UntilFalseProperty() throws PrismException, SimulatorException {
+	public UntilFalseProperty() throws PrismException {
 		super(null, null);
 	}
 

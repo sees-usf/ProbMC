@@ -31,7 +31,7 @@
 
 package dipro.run;
 import java.awt.*;
-import prism.*;
+//import prism.*;
 import java.net.URL;
 
 public class Splash extends Frame 

@@ -34,10 +34,10 @@ package dipro.h.cluster;
 import prism.PrismException;
 import dipro.alg.BF;
 import dipro.graph.Vertex;
-import dipro.h.Heuristic;
+//import dipro.h.Heuristic;
 import dipro.h.PrismHeuristic;
 import dipro.run.Context;
-import dipro.run.PrismDefaultContext;
+//import dipro.run.PrismDefaultContext;
 import dipro.stoch.prism.PrismState;
 
 public class ClusterMinimumHeuristic extends PrismHeuristic {

@@ -39,7 +39,7 @@ import java.awt.Toolkit;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+//import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
@@ -47,7 +47,7 @@ import javax.swing.UIManager;
 
 
 import dipro.run.Config;
-import dipro.run.Registry;
+//import dipro.run.Registry;
 import dipro.vis.Visualizer;
 
 public class GUI extends JFrame {
@@ -64,7 +64,7 @@ public class GUI extends JFrame {
 	
 	
 	private MainMenuBar menuBar;
-	private JPanel pane;
+	//private JPanel pane;
 	private JSplitPane mainPane;
 	private JTextArea console;
 	private boolean loaded;
