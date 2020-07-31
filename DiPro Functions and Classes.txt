@@ -1,0 +1,169 @@
+Function - Class - Notes
+-------------------------------
+main - Main
+start - Main
+run - Main
+
+createDiPro - Main
+
+loadConfig - DiPro
+parseArgs - DiPro
+Config - Config - is a constructor
+commit - Config
+init - DiPro - interface Context
+
+loadContext - DiPro
+PrismDefaultContext - PrismDefaultContext
+AbstractPrismContext - AbstractPrismContext 
+AbstractContext - AbstractContext 
+readParameters - PrismDefaultContext
+
+init - AbstractContext - interface
+loadModel - PrismDefaultContext
+prismFileLog - PrismFileLog - constructor from prism source
+prismFileLog - PrismFileLog - constructor from prism source
+PrismDefaultModel - PrismDefaultModel 
+this - PrismDefaultModel - the other constructor for it
+PrismRawModel - PrismRawModel
+Prism - Prism - constructor from prism source
+initialise - Prism - from prism source
+parseModelFile - Prism - from  prism source
+parsePropertiesFile - Prism - from prism source
+defineConstants - PrismRawModel
+defineConstants - PrismRawModel
+UndefinedConstants - UndefinedConstants - constructor from prism source
+getMFNumUndefined - UndefinedConstants - from prism source
+getPFNumUndefined - UndefinedConstants - from prism source
+getMFUndefined - UndefinedConstants - from prism source
+checkAllDefined - UndefinedConstants - from prism source
+initaliseIterators - UndefinedConstants - from prism source
+setUnDefinedConstants - UndefinedConstants - from prism source
+setUnDefinedConstants - UndefinedConstants - from prism source
+values - Values - constructor from prism source
+addValues - Values - from prism source
+addValues - Values - from prism source
+initValues - PrismRawModel
+PrismState - PrismState
+createMarkovModel - PrismDefaultModel - interface
+isPlugin - Dipro
+LoadProperty - PrismUntil
+getProperty - PropertiesFile - from prism source
+getExpression - Expression - from prism source
+getOperator - ExpressionTemporal - from prism source
+getUpperBound - ExpressionTemporal - from prism source
+PrismUntil - PrismUntil
+getInitialState - MarkovModel
+getInitialState -  MRMCModel - interface StateSpace 
+
+loadAlgorithm - AbstractPrismContext - interfaceContext
+createSearch - ProbXSearchCreator
+
+init - BF - interface 
+loadHeuristic - abstractContext - interface Context
+createSolutionCollector - abstractPrismContext - interface Context
+StochXSolutionCollector - StochXSolutionCollector - constructor
+init - BF - called another version
+reset - BF
+createExploredSpace - BF
+createExploredGraph - AbstractContext
+searchTree - searchTree - constructor
+ExploredGraph - ExploredGraph - constructor
+arrangeGraph - BF
+createSearchMark - BF
+searchMark - BF - constructor
+evaluate - EvaluationFunction
+computeDepht - EvaluationFunction
+set - Decoration
+computerG - EvaluationFunction
+set - Decoration
+set - Decoration
+open - SearchTree
+insertOpen - SearchTree
+offer - SelectionPriorityQueue
+f- BF
+setStatus - BF
+notifyObservers - BF
+
+execute - BF -  interface
+setStatus - BF
+notifyObservers - BF
+startCountingOffTime - BF
+notifyObservers - Observable - Java Util
+stopCountingOffTime - BF
+search - BF
+searchUntil - BF
+demandForResume - BF
+startCountingOffTime - BF
+stopCountingOffTime - BF
+doOneIteration - BF
+getOptimalOpen - SearchTree
+peek - SelectionPriorityQueue
+vertexToExpand - BF
+vertex - BF
+f - BF
+g - BF
+h - BF
+shouldExpand - BF
+check - PrismUntil - Proposition interface
+phi1 - PrismUntil
+getOperand1 - ExpressionTemporal - from prism source code
+evaluate - PrismUntil
+evaluate - PrismUntil - second version of evaluate
+ExpressionLabel - PrismUntil
+propertiesFile - PrismDefault
+propertiesFile - PrismRawModel
+getOperator - ExpressionUnaryOp - from Prism source code
+getOperand - ExpressionUnaryOp - from prism source code
+evaluate - PrismUntil
+getName - ExpressionLabel - from Prism source Code
+getLabel - Expression - from Prism source code
+evaluate - PrismUntil
+getOperand1 -  ExpressionBinaryOp - from prism source code
+getOperand2 - ExpressionBinaryOp - from prism source code
+getOperator = ExpressionBinaryOp - from prism source code
+evaluateBoolean - Expression - from prism source code
+phi2 - PrismUntil
+getOperand1 - ExpressionTemporal - from prism source code
+evaluate - PrismUntil
+evaluate - PrismUntil - second version of evaluate
+ExpressionLabel - PrismUntil
+propertiesFile - PrismDefault
+propertiesFile - PrismRawModel
+getOperator - ExpressionUnaryOp - from Prism source code
+getOperand - ExpressionUnaryOp - from prism source code
+evaluate - PrismUntil
+getName - ExpressionLabel - from Prism source Code
+getLabel - Expression - from Prism source code
+evaluate - PrismUntil
+getOperand1 -  ExpressionBinaryOp - from prism source code
+getOperand2 - ExpressionBinaryOp - from prism source code
+getOperator = ExpressionBinaryOp - from prism source code
+evaluateBoolean - Expression - from prism source code
+vertex - BF
+getOutgoingEdges - BF
+isExplored - SearchTree
+outgoingEdges - OntTheFlyStateSpace - interface directedGraph
+generateOutgoingTransitions - OnTheFlyStateSpace - public & abstract
+processOutgoingEdges - BF
+vertexExpanded - BF
+notifyObservers - BF
+iterationDone - BF- iterationDone
+notifyObservers - BF
+terminate - BF
+solultionCollector - BF
+solutionCollector - BF
+Report - BF
+getSummaryReport - BF
+
+cleanUp - BF
+reset - BF
+setStatus - BF
+notifyObservers - BF
+
+cleanup - AbstractContext  - interface context
+clear - PrismDefaultModel
+clear - PrismRawModel 
+clear - PrismRawModel 
+
+Reaches End of Program
+
