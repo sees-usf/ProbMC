@@ -1,0 +1,14 @@
+# Changelog
+
+## 2020 - 07 - 28
+### Added
+- Print statements that relate to what function was called. Is in format functionName - fileName
+
+### Changed
+- createMarkovModel function in the file PrismDefaultModel to be hardcoded to take a CTMC model. Must be manually changed to take a DTMC
+
+### Removed
+- The folder org.apache.commons.lang.enum because it was deprecated and caused errors. 
+
+### Fixed
+- XBF run for DiPro to run without errors
