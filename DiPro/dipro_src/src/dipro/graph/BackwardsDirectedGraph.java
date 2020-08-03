@@ -50,6 +50,7 @@ public class BackwardsDirectedGraph implements DirectedGraph {
 
 	@Override
 	public Iterator<WeightedDirectedEdge> outgoingEdges(Vertex v) {
+		System.out.println("outgoingEdges - backwardsDirectedGraph");
 		Iterator<? extends DirectedEdge> iter = graph.incomingEdges(v);
 		LinkedList<WeightedDirectedEdge> edges = new LinkedList<WeightedDirectedEdge>();
 		while (iter.hasNext()) {

@@ -152,6 +152,7 @@ public class AdjacenceHashGraph implements DirectedGraph {
 
 	@SuppressWarnings("unchecked")
 	public Iterator<DirectedEdge> outgoingEdges(final Vertex v) {
+		System.out.println("outgoingEdges - AdjacenceHashGraph");
 		if (!contains(v))
 			return Collections.EMPTY_LIST.iterator();
 		return base.get(v).outgoingEdges.iterator();

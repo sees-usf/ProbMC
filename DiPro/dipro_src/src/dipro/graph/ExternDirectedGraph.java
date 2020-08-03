@@ -102,6 +102,7 @@ public class ExternDirectedGraph implements DirectedGraph {
 
 	@Override
 	public Iterator<WeightedDirectedEdge> outgoingEdges(Vertex v) {
+		System.out.println("outgoingEdges - ExternDirectedGraph");
 		assert v instanceof DefaultVertex;
 		DefaultVertex s = ((DefaultVertex) v);
 		int id = s.getId();
