@@ -244,6 +244,7 @@ public class BF extends Observable {
 	 * @throws Exception
 	 */
 	protected void searchUntil() throws Exception {
+		System.out.println("searchUntil - BF");
 		while (!searchTree.isOpenEmpty()) {
 			System.out.println("\nIteration: "+ getNumIterations()+ "\nNumEdges: " + searchTree.numEdges() + " Num Vertices: " + searchTree.numVertices());
 			if (shouldTerminate()) {
@@ -277,6 +278,7 @@ public class BF extends Observable {
 	 * @throws Exception
 	 */
 	protected final void doOneIteration() throws Exception {
+		System.out.println("doOneIteration - BF");
 		iterations++; // Increments iteration @ beginning
 		if (getConfig().logLevel >= Config.ALG_LOG_DEBUG)
 			log("Search Iteration " + iterations);
@@ -632,8 +634,7 @@ public class BF extends Observable {
 		return new RelaxationInfo(flag, newMark, oldMark);
 	}
 
-	protected Iterator<? extends DirectedEdge> processOutgoingEdges(
-			SearchMark uMark, Iterator<? extends DirectedEdge> outgoingEdges) {
+	protected Iterator<? extends DirectedEdge> processOutgoingEdges(SearchMark uMark, Iterator<? extends DirectedEdge> outgoingEdges) {
 		return outgoingEdges;
 	}
 
@@ -1192,6 +1193,7 @@ public class BF extends Observable {
 		}
 
 		public double f() {
+			System.out.println("f - BF");	
 			return evaluationFunction.f(this);
 		}
 
