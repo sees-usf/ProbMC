@@ -282,9 +282,9 @@ public class Main {
 			out.println(context);
 			try {
 				alg = context.loadAlgorithm();
-				System.out.println("run - Main - after loadAlgorithm");
+				System.out.println("run - Main - after loadAlgorithm\n");
 				alg.init();
-				System.out.println("run - Main - after alg.init");
+				System.out.println("run - Main - after alg.init\n");
 				out.println("Search using " + alg + " ...");
 //				if(alg.getHeuristic()!=null) {
 //					out.println("Heuristic " + alg.getHeuristic().getClass().getName());

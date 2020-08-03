@@ -101,6 +101,7 @@ public abstract class AbstractContext implements Context {
 	}
 
 	protected void attachReporter(BF alg) throws FileNotFoundException {
+		System.out.println("attachReporter - AbstractContext");
 		String reportFileName = getReportFileName();
 		// System.out.println("Report: "+reportFileName);
 		PrintStream repOut = new PrintStream(new FileOutputStream(reportFileName));

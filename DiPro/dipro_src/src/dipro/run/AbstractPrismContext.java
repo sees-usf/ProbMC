@@ -84,13 +84,13 @@ public abstract class AbstractPrismContext extends AbstractContext {
 				if (property instanceof StochTBoundedUntil) {
 					if (config.usePi) {
 						assert graph.getClass() == UniformCTMC.class;
+						
 						alg = new PiXSearchCreator().createSearch(this);
 					} else {
 						assert graph.getClass() != UniformCTMC.class;
 						if (graph.getClass() == CTMC.class) {
 							if (config.lengthHeuristic) {
-								alg = new ProbXSearchCreator().createSearch(this,
-										true);
+								alg = new ProbXSearchCreator().createSearch(this,true);
 							} else {
 								alg = new ProbXSearchCreator().createSearch(this);
 							}
