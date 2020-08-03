@@ -12,3 +12,8 @@
 
 ### Fixed
 - XBF run for DiPro to run without errors
+
+
+## 2020 - 08 - 03
+### Changed
+- PrismRawModel functions - constructor, generateOutgoingTransitions, getPathValues
