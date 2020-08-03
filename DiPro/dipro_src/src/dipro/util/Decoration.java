@@ -56,6 +56,7 @@ public class Decoration {
 	 * 
 	 */
 	public void set(Attribute attr, Object value) {
+		System.out.println("set - Decoration");
 		attributes.put(attr, value);
 	}
 

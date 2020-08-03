@@ -53,9 +53,11 @@ public class EvaluationFunction {
 
 	public double evaluate(BF.SearchMark uMark, DirectedEdge uv,
 			BF.SearchMark vMark) throws Exception {
+		System.out.println("Evaluate - EvaluationFunction");
 		int d = computeDepth(uMark, uv, vMark);
 		vMark.set(DEPTH, d);
 		if (!alg.getConfig().greedy) {
+			System.out.println("evaluate if statement 1 - EvalautionFunction");
 			double g = computeG(uMark, uv, vMark);
 			if(Double.isInfinite(g) || Double.isNaN(g)) 
 				throw new DiProException("Numerical over- or underflow: g-value = "+g);
@@ -81,6 +83,7 @@ public class EvaluationFunction {
 			BF.SearchMark vMark) throws Exception {
 		double g = 0.0d;
 		if (uv != null) {
+			System.out.println("computeG- EvalautionFunction");
 			assert uv.source().equals(uMark.vertex());
 			g = uMark.g() + alg.getGraph().weight(uv);
 		}
@@ -93,10 +96,10 @@ public class EvaluationFunction {
 		return isLengthBased;
 	}
 	
-	protected int computeDepth(BF.SearchMark uMark, DirectedEdge uv,
-			BF.SearchMark vMark) {
+	protected int computeDepth(BF.SearchMark uMark, DirectedEdge uv, BF.SearchMark vMark) {
 		int d = 0;
 		if (uv != null) {
+			System.out.println("computeDepth - EvalautionFunction");
 			assert uv.source().equals(uMark.vertex());
 			d = uMark.depth() + 1;
 		}
@@ -141,7 +144,7 @@ public class EvaluationFunction {
 	}
 
 	public double computeH(BF.SearchMark vMark) throws Exception {
-						
+		System.out.println("Compute H - EvaluationFUnction");			
 		if (alg.getHeuristic() == null)
 			return 0.0f;
 		return alg.getHeuristic().evaluate(vMark.vertex());
@@ -149,7 +152,7 @@ public class EvaluationFunction {
 
 	public double computeH(BF.SearchMark uMark, DirectedEdge uv,
 			BF.SearchMark vMark) throws Exception {
-		
+		System.out.println("ComputerH - EvaluationFunction");	
 		if (alg.getHeuristic() == null)
 			return 0.0f;
 		if (uv == null)

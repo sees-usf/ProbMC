@@ -118,6 +118,7 @@ public class SearchTree implements DirectedGraph {
 	}
 
 	protected void insertOpen(BF.SearchMark vMark) {
+		System.out.println("insertOpen - searchTree");	
 		assert isOpen(vMark.vertex()) == null;
 		open.put(vMark.vertex(), vMark);
 		queue.offer(vMark);
@@ -134,6 +135,7 @@ public class SearchTree implements DirectedGraph {
 	}
 	
 	public void open(SearchMark mark) {
+		System.out.println("open - SearchTree");	
 		assert isExplored(mark.vertex()) == null;
 		insertOpen(mark);
 	}
