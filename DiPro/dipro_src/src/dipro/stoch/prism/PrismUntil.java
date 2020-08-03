@@ -187,12 +187,14 @@ public class PrismUntil implements StochUntil {
 		System.out.println("check - PrismUntil");
 		try {
 			boolean a = evaluate(phi1(), s);
+			System.out.println("phi2 - PrismUntil");
 			boolean b = evaluate(phi2(), s);
 			int result = b ? TRUE : a ? FALSE : NEVER;
 			/*
 			 * < ForDebugging > if(result==NEVER)
 			 * System.out.println("NEVER: "+vertex); /* </ ForDebugging >
 			 */
+			System.out.println("\ncheck Return - PrismUntil");
 			return result;
 		} catch (Exception e) {
 			RuntimeException re = new RuntimeException(e);
@@ -201,76 +203,78 @@ public class PrismUntil implements StochUntil {
 		}
 	}
 
-	protected boolean evaluate(Expression phi, PrismState s)
-			throws DiProException, PrismException {
+	protected boolean evaluate(Expression phi, PrismState s) throws DiProException, PrismException {
+		System.out.println("\nevaluate - PrismUntil");
 		return evaluate(phi, s.values);
 	}
 
-	protected boolean evaluate(Expression phi, Values varValues)
-			throws PrismException, DiProException {
+	protected boolean evaluate(Expression phi, Values varValues) throws PrismException, DiProException {
 		// This function is only defined for boolean expressions.
 		//assert phi.getType() == Expression.BOOLEAN;
 		boolean value;
+		System.out.println("evaluate2 - PrismUntil");
 		if (phi instanceof ExpressionUnaryOp) {
+			System.out.println("UnaryOp - PrismUntil");
 			int op = ((ExpressionUnaryOp) phi).getOperator();
 			switch (op) {
-			case ExpressionUnaryOp.NOT:
-				value = !evaluate(((ExpressionUnaryOp) phi).getOperand(),
-						varValues);
-				break;
-			case ExpressionUnaryOp.PARENTH:
-				value = evaluate(((ExpressionUnaryOp) phi).getOperand(),
-						varValues);
-				break;
-			default:
-				// The operator left is ExpressionUnaryOp.MINUS which
-				// can't occur in a boolean expression.
-				throw new DiProException("Invalid subformula " + phi);
+				case ExpressionUnaryOp.NOT:
+					value = !evaluate(((ExpressionUnaryOp) phi).getOperand(),
+							varValues);
+					break;
+				case ExpressionUnaryOp.PARENTH:
+					value = evaluate(((ExpressionUnaryOp) phi).getOperand(),
+							varValues);
+					break;
+				default:
+					// The operator left is ExpressionUnaryOp.MINUS which
+					// can't occur in a boolean expression.
+					throw new DiProException("Invalid subformula " + phi);
 			}
 			return value;
 		}
 		if (phi instanceof ExpressionBinaryOp) {
+			System.out.println("ExpressionBinaryOp - PrismUntil");
 			Expression expr1 = ((ExpressionBinaryOp) phi).getOperand1();
 			Expression expr2 = ((ExpressionBinaryOp) phi).getOperand2();
 			int op = ((ExpressionBinaryOp) phi).getOperator();
 			switch (op) {
-			case ExpressionBinaryOp.EQ:
-			case ExpressionBinaryOp.GE:
-			case ExpressionBinaryOp.GT:
-			case ExpressionBinaryOp.LE:
-			case ExpressionBinaryOp.LT:
-			case ExpressionBinaryOp.NE:
-				value = phi.evaluateBoolean(model.constantValues(), varValues);
-				break;
-			case ExpressionBinaryOp.IMPLIES:
-				value = !evaluate(expr1, varValues)
-						|| evaluate(expr2, varValues);
-				break;
-			case ExpressionBinaryOp.AND:
-				value = evaluate(expr1, varValues)
-						&& evaluate(expr2, varValues);
-				break;
-			case ExpressionBinaryOp.OR:
-				value = evaluate(expr1, varValues)
-						|| evaluate(expr2, varValues);
-				break;
-			// Other operators (ExpressionBinaryOp.PLUS, MINUS, TIMES and DEVID)
-			// can't occur in a boolean expression.
-			default:
-				throw new DiProException("Invalid subformula " + phi);
+				case ExpressionBinaryOp.EQ:
+				case ExpressionBinaryOp.GE:
+				case ExpressionBinaryOp.GT:
+				case ExpressionBinaryOp.LE:
+				case ExpressionBinaryOp.LT:
+				case ExpressionBinaryOp.NE:
+					System.out.println("evaluateBoolean case- PrismUntil");
+					value = phi.evaluateBoolean(model.constantValues(), varValues);
+					break;
+				case ExpressionBinaryOp.IMPLIES:
+					value = !evaluate(expr1, varValues)
+							|| evaluate(expr2, varValues);
+					break;
+				case ExpressionBinaryOp.AND:
+					value = evaluate(expr1, varValues)
+							&& evaluate(expr2, varValues);
+					break;
+				case ExpressionBinaryOp.OR:
+					value = evaluate(expr1, varValues)
+							|| evaluate(expr2, varValues);
+					break;
+				// Other operators (ExpressionBinaryOp.PLUS, MINUS, TIMES and DEVID)
+				// can't occur in a boolean expression.
+				default:
+					throw new DiProException("Invalid subformula " + phi);
 			}
 			return value;
 		}
-		if (phi instanceof ExpressionConstant
-				|| phi instanceof ExpressionLiteral
-				|| phi instanceof ExpressionFunc
+		if (phi instanceof ExpressionConstant || phi instanceof ExpressionLiteral || phi instanceof ExpressionFunc
 				|| phi instanceof ExpressionVar) {
 			System.out.println("Other things- evaluate - PRISMUNTIL");
 			value = phi.evaluateBoolean(model.constantValues(), varValues);
 			return value;
 		}
 		if (phi instanceof ExpressionLabel) {
-			System.out.println("Properties - -  - " + prismModel().propertiesFile().getLabelList());
+			System.out.println("ExpressionLabel - PrismUntil");
+			//System.out.println("Properties - -  - " + prismModel().propertiesFile().getLabelList());
 			//System.out.println("Expression Label - PrismUntil" + prismModel().propertiesFile().getLabelList().size() + ((ExpressionLabel) phi).getName());
 			int i = prismModel().propertiesFile().getLabelList().getLabelIndex(((ExpressionLabel) phi).getName());
 			Expression expr = prismModel().propertiesFile().getLabelList().getLabel(i); 

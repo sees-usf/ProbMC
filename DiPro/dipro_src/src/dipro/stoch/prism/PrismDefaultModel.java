@@ -57,6 +57,7 @@ import dipro.stoch.CTMC;
 import dipro.stoch.DTMC;
 import dipro.stoch.MDP;
 import dipro.stoch.MarkovModel;
+import dipro.stoch.prism.PrismRawModel;
 
 public class PrismDefaultModel extends OnTheFlyStateSpace implements PrismModel {
 

@@ -47,6 +47,7 @@ import java.util.Vector;
 
 import parser.ParseException;
 import parser.Values;
+import parser.type.Type;
 import parser.ast.Expression;
 import parser.ast.ExpressionConstant;
 import parser.ast.ExpressionLiteral;
@@ -58,6 +59,7 @@ import parser.ast.ModulesFile;
 import parser.ast.PropertiesFile;
 import prism.Prism;
 import prism.ModelType;
+import prism.PrismComponent;
 import prism.PrismException;
 import prism.PrismLangException;
 import prism.UndefinedConstants;
@@ -106,7 +108,8 @@ class PrismRawModel {
 	throws InvalidPropertiesFormatException, PrismException,
 	ParseException, IOException{
 		this.context = context;
-		prism = new Prism(context.getPrismMainLog(), context.getPrismTechLog());
+		//prism = new Prism(context.getPrismMainLog(), context.getPrismTechLog());
+		prism = new Prism(context.getPrismMainLog());
 		prism.initialise();
 		if (context.getDiPro().isPlugin()) {
 			modulesFile = context.getConfig().getModel();
@@ -117,13 +120,14 @@ class PrismRawModel {
 		} else {
 			parseModel();
 		}
-		/*engine = new SimulatorEngine();
-		engine.startNewPath(modulesFile, propertiesFile, initValues());
+		
+		engine = new SimulatorEngine(prism);
+		engine.startNewPath(modulesFile, propertiesFile, initValues()); // Doesn't exist
 		int n = engine.getNumVariables();
 		variablesNames = new Vector<String>(n);
 		for (int i = 0; i < n; i++)
 			variablesNames.add(i, engine.getVariableName(i));
-		stateSize = calculateStateSize();*/
+		stateSize = calculateStateSize(); // Exists, but is broken
 	}
 	
 	//Constructor
@@ -159,7 +163,8 @@ class PrismRawModel {
 		defineConstants();
 	}
 	
-	/*private int calculateStateSize() throws SimulatorException {
+	//private int calculateStateSize() throws SimulatorException {
+	private int calculateStateSize(){
 		int size = 0;
 		for (int i = 0; i < variablesNames.size(); i++) {
 			int type = engine.getVariableType(i);
@@ -179,7 +184,7 @@ class PrismRawModel {
 			}
 		}
 		return size;
-	}*/
+	}
 
 	//Sets up to call other defineConstants function
 	private void defineConstants() throws PrismException {
@@ -220,11 +225,10 @@ class PrismRawModel {
 	@SuppressWarnings("static-access")
 	Collection<PrismTransition> generateOutgoingTransitions(PrismState s) {
 		PrismState s1 = s;
-//		float totalExitRate = -1.0f;
+//		float totalExitRate = -1.0f; Already Commented Out
 		List<PrismTransition> outgoingTransitions = new LinkedList<PrismTransition>();
-		try {
-			System.out.println("GenerateOutgoing Transitions - PrismRawModel");
-			//restartNewPath(s1.values());
+		/*try {
+			engine.restartNewPath(s1.values());
 			engine.createNewPath();
 			int numUpdates = engine.getNumVariables();
 			for (int i = 0; i < numUpdates; i++) {
@@ -243,12 +247,38 @@ class PrismRawModel {
 			}
 		} finally {
 			return outgoingTransitions;
-		}
+		}*/
 		
+		// My Code
+		try {
+			System.out.println("GenerateOutgoing Transitions at beginning- PrismRawModel");
+			//engine.restartNewPath(s1.values()); // Doesn't exist
+			engine.createNewPath(); //Exists; resets simulation variables
+			System.out.println("GenerateOutgoing Transitions after new path - PrismRawModel");
+			int numUpdates = engine.getNumVariables(); // Exists
+			System.out.println("GenerateOutgoing Transitions after getNumVariables - PrismRawModel");
+			for (int i = 0; i < numUpdates; i++) {
+				assert engine.getPathSize() == 1; // Exists
+				engine.manualTransition(i); // Exists
+				Values v = getPathValues(1); // Exists is broken
+				PrismState s2 = new PrismState(v);
+				engine.backtrackTo(0); // Exists
+				PrismTransition trans = (PrismTransition) createTransition(s1,s2); // Exists
+				fillTransition(trans, i); // Exists is broken
+	//			if(type() == ModulesFile.STOCHASTIC) { Already commented out
+	//				totalExitRate = trans.getProbOrRate();
+	//			}
+				outgoingTransitions.add(trans);
+			}
+		} catch (PrismException e) {
+			Registry.getMain().handleFatalError("Prism Exception Failure!", e);
+		}
+		return outgoingTransitions;
 		
 		//catch (SimulatorException e) {
 			//Registry.getMain().handleFatalError("Prism Simulation Engine Failure!", e);
 		//}
+		// Already commented out
 //		assert type() == ModulesFile.STOCHASTIC || totalExitRate == -1.0;
 //		if(type() == ModulesFile.STOCHASTIC) {
 //			for(PrismTransition t : outgoingTransitions) {
@@ -276,23 +306,34 @@ class PrismRawModel {
 
 	@SuppressWarnings("static-access")
 	protected Values getPathValues(int pathIndex) {
+		System.out.println("getPathValues - PrismRawModel");
 		Values v = new Values();
 		for (String varName : variablesNames) {
-			int j = engine.getIndexOfVar(varName);
-			int x = engine.getPathData(j, pathIndex);
-			int type = engine.getVariableType(j);
+			/*int j = engine.getIndexOfVar(varName);
+			int x = engine.getPathData(j, pathIndex); // Doesn't exist anymore
+			int type = engine.getVariableType(j); // Returns Type
 			Object value;
 			switch (type) {
-			case SimulatorEngine.BOOLEAN:
+				case SimulatorEngine.BOOLEAN:
+					value = x == 0 ? new Boolean(false) : new Boolean(true);
+					break;
+				case SimulatorEngine.INTEGER:
+					value = new Integer(x);
+					break;
+				default:
+					//throw new SimulatorException("Invalid type for variable "
+					//		+ varName);
+				}
+				v.addValue(varName, value);*/
+			int j = engine.getIndexOfVar(varName);
+			int x = engine.getPathData(j, pathIndex); // Doesn't exist
+			Type type = engine.getVariableType(j);
+			Object value;
+			String typeString = type.getTypeString();
+			if (typeString == "bool")
 				value = x == 0 ? new Boolean(false) : new Boolean(true);
-				break;
-			case SimulatorEngine.INTEGER:
+			else if (typeString == "int")
 				value = new Integer(x);
-				break;
-			default:
-				throw new SimulatorException("Invalid type for variable "
-						+ varName);
-			}
 			v.addValue(varName, value);
 		}
 		return v;
@@ -300,15 +341,13 @@ class PrismRawModel {
 
 	@SuppressWarnings("static-access")
 	protected Transition fillTransition(PrismTransition trans, int updateIndex) {
-		String label = engine.getActionLabelOfUpdate(updateIndex);
-		String assigDescr = engine
-				.getAssignmentDescriptionOfUpdate(updateIndex);
-		float p = (float) engine.getProbabilityOfUpdate(updateIndex);
-		String moduleName = engine.getModuleNameOfUpdate(updateIndex);
-		int actionIndex = engine.getDistributionIndexOfUpdate(updateIndex);
-		int moduleIndex = engine.getModuleIndexOfUpdate(updateIndex);
-		PrismTransitionData data = new PrismTransitionData(moduleName,
-				moduleIndex, label, actionIndex, p, assigDescr);
+		String label = engine.getActionLabelOfUpdate(updateIndex); // Doesn't exist
+		String assigDescr = engine.getAssignmentDescriptionOfUpdate(updateIndex); // Doesn't exist
+		float p = (float) engine.getProbabilityOfUpdate(updateIndex); // Doesn't exist
+		String moduleName = engine.getModuleNameOfUpdate(updateIndex); // Doesn't exist
+		int actionIndex = engine.getDistributionIndexOfUpdate(updateIndex); // Doesn't exist
+		int moduleIndex = engine.getModuleIndexOfUpdate(updateIndex); // Doesn't exist
+		PrismTransitionData data = new PrismTransitionData(moduleName, moduleIndex, label, actionIndex, p, assigDescr);
 		trans.setTransitionData(data);
 		return trans;
 	}
