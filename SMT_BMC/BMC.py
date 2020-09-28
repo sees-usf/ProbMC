@@ -64,7 +64,7 @@ def PathEncoding(path_length, model_file_name):
     return path
         
 new_model_list = []
-def BMC(path, path_length, property_prob):
+def BMC(path, path_length):
     """Finds a counter-example model given a path and returns the probability of the path occuring"""
     cur_s_list = []  # List of current states
     pv_list = []  # List of probability values
@@ -148,7 +148,7 @@ def BMC(path, path_length, property_prob):
     solver.add(bounded_model)
     total_probability = 0
     try:  # Only ran if a counter-example was found
-        while(total_probability < property_prob):
+        while(True):  # Calculate the probability of all counter examples that can be generated
             solver.check()
             # print(solver.model())
             cx_model = solver.model()
@@ -190,16 +190,8 @@ def BMC(path, path_length, property_prob):
             solver.add(new_bounded_model)
             # print(probability)
             total_probability += probability  # Adding the probability of each cx at the given pathlength
-            # print(total_probability)
-            if total_probability >= 1:  # this is never met, get rid of?
-                print("Invalid probability achieved")
-                break
-        if total_probability >= property_prob:
-            # In this pathlength alone, a probability was found that fits the property's probability
-            return total_probability
     except:
         # No more counter examples can be found
-        # print("No, a counter example was not found at a probability greater than {}.".format(property_prob))
         return total_probability
 
 
@@ -219,8 +211,7 @@ path_length = int(input("Provide a path length: "))
 # or until the designated path_length is reached
 total_probability = 0
 for i in range(1, (path_length+1)):
-    path_length = i
-    prob_from_step = BMC(PathEncoding(path_length, model_file_name), path_length, property_prob)
+    prob_from_step = BMC(PathEncoding(i, model_file_name), i)
     print(i, prob_from_step)
     total_probability += prob_from_step
     if total_probability >= property_prob:
