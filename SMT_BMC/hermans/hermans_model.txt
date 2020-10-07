@@ -1,0 +1,16 @@
+    current_x1 = Bool("current_x1")
+    next_x1 = Bool("next_x1")
+    current_x2 = Bool("current_x2")
+    next_x2 = Bool("next_x2")
+    current_x3 = Bool("current_x3")
+    next_x3 = Bool("next_x3")
+    probability = Real("probability")
+
+    choice1 = And(current_x1==current_x3, (Or(And(probability==0.5, next_x1==False), And(probability==0.5, next_x1==True))))
+    choice2 = And(current_x1!=current_x3, next_x1==current_x3)
+    choice3 = And(current_x2==current_x1, (Or(And(probability==0.5, next_x2==False), And(probability==0.5, next_x2==True))))
+    choice4 = And(current_x2!=current_x1, next_x2==current_x1)
+    choice5 = And(current_x3==current_x2, (Or(And(probability==0.5, next_x3==False), And(probability==0.5, next_x3==True))))
+    choice6 = And(current_x3!=current_x2, next_x3==current_x2)
+
+    step = And(choice1, choice2, choice3, choice4, choice5, choice6)

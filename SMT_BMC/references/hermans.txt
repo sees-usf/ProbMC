@@ -14,7 +14,7 @@
 	
 	[step] (x1=x3) -> p : (x1'=0) + 1-p : (x1'=1);
 	[step] !(x1=x3) -> (x1'=x3);
-	
+	# Synchronization actions
 	endmodule
 	
 	# add further processes through renaming
@@ -37,3 +37,73 @@
 	
 	# label - stable configurations (1 token)
 	label "stable" = num_tokens=1;
+
+	# num_tokens=1 prob > 0.9
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	const double p = 0.5;
+	
+	module process1
+	
+	# Boolean variable for process 1
+	x1 : [0..1];
+	
+	[step] (x1=x3) -> p : (x1'=0) + 1-p : (x1'=1);
+	[step] !(x1=x3) -> (x1'=x3);
+	# Synchronization actions
+	endmodule
+	
+	# add further processes through renaming
+	module process2 = process1 [ x1=x2, x3=x1 ] endmodule
+	module process3 = process1 [ x1=x3, x3=x2 ] endmodule
+
+  x1=x3 -> p : (x1'=0) + 1-p : (x1'=1);
+  !(x1=x3) -> (x1'=x3);
+  x2=x1 -> p : (x2'=0) + 1-p : (x2'=1);
+  !(x2=x1) -> (x2'=x1);
+  x3=x2 -> p : (x3'=0) + 1-p : (x3'=1);
+  !(x3=x2) -> (x3'=x2);
+
+	
+	
+	# set of initial states: all (i.e. any possible initial configuration of tokens)
+	init
+	true
+	endinit
+	
+	# formula, for use in properties: number of tokens
+	# (i.e. number of processes that have the same value as the process to their left)
+	formula num_tokens = (x1=x2?1:0)+(x2=x3?1:0)+(x3=x1?1:0);
+	
+	# label - stable configurations (1 token)
+	label "stable" = num_tokens=1;
+
+    choice1 = And(current_s==0, (Or(And(probability==0.5, dice_value==0, next_s==1), And(probability==0.5, dice_value==0, next_s==2))))
+    choice2 = And(current_s==1, (Or(And(probability==0.5, dice_value==0, next_s==3), And(probability==0.5, dice_value==0, next_s==4))))
+    choice3 = And(current_s==2, (Or(And(probability==0.5, dice_value==0, next_s==5), And(probability==0.5, dice_value==0, next_s==6))))
+    choice4 = And(current_s==3, (Or(And(probability==0.5, dice_value==0, next_s==1), And(probability==0.5, dice_value==1, next_s==7))))
+    choice5 = And(current_s==4, (Or(And(probability==0.5, dice_value==2, next_s==7), And(probability==0.5, dice_value==3, next_s==7))))
+    choice6 = And(current_s==5, (Or(And(probability==0.5, dice_value==4, next_s==7), And(probability==0.5, dice_value==5, next_s==7))))
+    choice7 = And(current_s==6, (Or(And(probability==0.5, next_s==2), And(probability==0.5, dice_value==6, next_s==7))))
+    choice8 = And(current_s==7, next_s==7, dice_value==0)
+
+    step = And(ranges, Or(choice1, choice2, choice3, choice4, choice5, choice6, choice7, choice8))

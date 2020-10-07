@@ -22,10 +22,6 @@ def PathEncoding(path_length, model_file_name):
     Returns an encoding of ALL paths with length up to path_length
     This path, starting from initial state and ending at the negation of the property 
     """
-    cur_s_list = []  # List of current states
-    pv_list = []  # List of probability values
-    dv_list = []  # List of dice values
-    next_s_list = []  # List of next states
     choices_list = []  # List of choice constraints after a path_length amount of steps
     for k in range(path_length):
         # Read in given model file
@@ -33,10 +29,13 @@ def PathEncoding(path_length, model_file_name):
             filedata = modelfile.read()
 
         # Replace the variable names
-        filedata = filedata.replace('current_s', 's{0}'.format(k))
+        filedata = filedata.replace('current_x1', 'current_x1_{0}'.format(k))
+        filedata = filedata.replace('current_x2', 'current_x2_{0}'.format(k))
+        filedata = filedata.replace('current_x3', 'current_x3_{0}'.format(k))
         filedata = filedata.replace('probability', 'p{0}'.format(k+1))
-        filedata = filedata.replace('next_s', 's{0}'.format(k+1))
-        filedata = filedata.replace('dice_value', 'dv{0}'.format(k+1))
+        filedata = filedata.replace('next_x1', 'next_x1_{0}'.format(k+1))
+        filedata = filedata.replace('next_x2', 'next_x2_{0}'.format(k+1))
+        filedata = filedata.replace('next_x3', 'next_x3_{0}'.format(k+1))
 
         # Rewrite model.py GetStep() with new model
         with open('model.py', 'r') as modelfile :
@@ -66,10 +65,7 @@ def PathEncoding(path_length, model_file_name):
 new_model_list = []
 def BMC(path, path_length):
     """Finds a counter-example model given a path and returns the probability of the path occuring"""
-    cur_s_list = []  # List of current states
-    pv_list = []  # List of probability values
-    dv_list = []  # List of dice values
-    next_s_list = []  # List of next states
+    
     properties_list = []  # List of property constraints after a path_length amount of steps
     global new_model_list  # Global list of cx's already reached, including prior steps.
 
@@ -80,10 +76,13 @@ def BMC(path, path_length):
             filedata = propertyfile.read()
 
         # Replace the variable names
-        filedata = filedata.replace('current_s', 's{0}'.format(k))
+        filedata = filedata.replace('current_x1', 'current_x1_{0}'.format(k))
+        filedata = filedata.replace('current_x2', 'current_x2_{0}'.format(k))
+        filedata = filedata.replace('current_x3', 'current_x3_{0}'.format(k))
         filedata = filedata.replace('probability', 'p{0}'.format(k+1))
-        filedata = filedata.replace('next_s', 's{0}'.format(k+1))
-        filedata = filedata.replace('dice_value', 'dv{0}'.format(k+1))
+        filedata = filedata.replace('next_x1', 'next_x1_{0}'.format(k+1))
+        filedata = filedata.replace('next_x2', 'next_x2_{0}'.format(k+1))
+        filedata = filedata.replace('next_x3', 'next_x3_{0}'.format(k+1))
 
         # Rewrite property.py GetProperty() with new property
         with open('property.py', 'r') as propertyfile :
@@ -113,10 +112,13 @@ def BMC(path, path_length):
                 filedata = initialfile.read()
 
             # Replace the variable names
-            filedata = filedata.replace('current_s', 's0')
+            filedata = filedata.replace('current_x1', 'current_x1_0')
+            filedata = filedata.replace('current_x2', 'current_x2_0')
+            filedata = filedata.replace('current_x3', 'current_x3_0')
             filedata = filedata.replace('probability', 'p1')
-            filedata = filedata.replace('next_s', 's1')
-            filedata = filedata.replace('dice_value', 'dv1')
+            filedata = filedata.replace('next_x1', 'next_x1_1')
+            filedata = filedata.replace('next_x2', 'next_x2_1')
+            filedata = filedata.replace('next_x3', 'next_x3_1')
 
             # Rewrite initial_states.py GetInitialStates() with new initial states
             with open('initial_states.py', 'r') as initialfile:
@@ -142,11 +144,17 @@ def BMC(path, path_length):
         properties = Or(properties_list)
         bounded_model = And(initial_state, path, properties)
 
-    # print(bounded_model)
+    print(bounded_model)
     # Checking the Bounded Model
     solver = Solver()
-    solver.add(bounded_model)
+    if new_model_list:
+        past_path_constraints = And(new_model_list)
+        new_bounded_model = And(bounded_model, past_path_constraints)
+        solver.add(new_bounded_model)
+    else:
+        solver.add(bounded_model)
     total_probability = 0
+    print(solver.check())
     try:  # Only ran if a counter-example was found
         while(True):  # Calculate the probability of all counter examples that can be generated
             solver.check()

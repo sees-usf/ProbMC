@@ -1,0 +1,8 @@
+    current_x1 = Bool("current_x1")
+    next_x1 = Bool("next_x1")
+    current_x2 = Bool("current_x2")
+    next_x2 = Bool("next_x2")
+    current_x3 = Bool("current_x3")
+    next_x3 = Bool("next_x3")
+
+    initial_states = And(current_x1==True, current_x3==True)
