@@ -59,7 +59,76 @@ def PathEncoding(path_length, model_file_name):
     # print(path)
     return path
         
-        
+
+def GetProperty(step_number, property_file_name):
+    """Returns the property from the property_file_name found at the given step_number"""
+    # Read in given property file
+    with open(property_file_name, 'r') as propertyfile:
+        filedata = propertyfile.read()
+
+    # Replace the variable names
+    filedata = filedata.replace('current_s', 's{0}'.format(step_number))
+    filedata = filedata.replace('probability', 'p{0}'.format(step_number+1))
+    filedata = filedata.replace('next_s', 's{0}'.format(step_number+1))
+    filedata = filedata.replace('dice_value', 'dv{0}'.format(step_number+1))
+    # Rewrite property.py GetProperty() with new property
+    with open('src/property.py', 'r') as propertyfile :
+        property_file_data = propertyfile.read()
+    
+    original_file_data = property_file_data
+    property_file_data = property_file_data.replace('#property_info', filedata)
+
+    with open('src/property.py', 'w') as propertyfile:
+        propertyfile.write(property_file_data)
+
+    importlib.reload(property)
+
+    property_retrieved = property.GetProperty()
+
+    # Return property.py to its original form
+    with open('src/property.py', 'w') as modelfile:
+        modelfile.write(original_file_data)
+
+    importlib.reload(property)
+
+    return property_retrieved
+
+
+def GetInitialStates(init_states_file_name):
+    """Returns the initial state from init_states_file_name"""
+    # Read in given initial states file
+    with open(init_states_file_name, 'r') as initialfile:
+        filedata = initialfile.read()
+
+    # Replace the variable names
+    filedata = filedata.replace('current_s', 's0')
+    filedata = filedata.replace('probability', 'p1')
+    filedata = filedata.replace('next_s', 's1')
+    filedata = filedata.replace('dice_value', 'dv1')
+
+    # Rewrite initial_states.py GetInitialStates() with new initial states
+    with open('src/initial_states.py', 'r') as initialfile:
+        init_file_data = initialfile.read()
+
+    original_file_data = init_file_data
+    init_file_data = init_file_data.replace("#initial_state_info", filedata)
+
+    with open('src/initial_states.py', 'w') as initialfile:
+        initialfile.write(init_file_data)
+
+    importlib.reload(initial_states)
+
+    initial_state = initial_states.GetInitialStates()
+
+    # Return initial_states.py to original form
+    with open('src/initial_states.py', 'w') as initialfile:
+        initialfile.write(original_file_data)
+
+    importlib.reload(initial_states)
+
+    return initial_state
+
+
 reached_cx_list = []
 def ExcludePath(cx_model, path_length):
     """
@@ -92,76 +161,17 @@ def ExcludePath(cx_model, path_length):
     return all_cx_constraints
 
 
-def BMC(path, path_length):
+def BMC(path, path_length, property_file, init_states_file):
     """Finds a counterexample model given a path and returns the probability of the path occuring"""
-    properties_list = []  # List of property constraints after a path_length amount of steps
     global reached_cx_list  # Global list of cx's already reached, including prior steps.
 
+    # Build the Bounded Model
+    properties_list = []  # List of property constraints after a path_length amount of steps
     for k in range(path_length):
-        """ Property """
-        # Read in given property file
-        with open(property_file_name, 'r') as propertyfile:
-            filedata = propertyfile.read()
-
-        # Replace the variable names
-        filedata = filedata.replace('current_s', 's{0}'.format(k))
-        filedata = filedata.replace('probability', 'p{0}'.format(k+1))
-        filedata = filedata.replace('next_s', 's{0}'.format(k+1))
-        filedata = filedata.replace('dice_value', 'dv{0}'.format(k+1))
-
-        # Rewrite property.py GetProperty() with new property
-        with open('src/property.py', 'r') as propertyfile :
-            property_file_data = propertyfile.read()
-        
-        original_file_data = property_file_data
-        property_file_data = property_file_data.replace('#property_info', filedata)
-
-        with open('src/property.py', 'w') as propertyfile:
-            propertyfile.write(property_file_data)
-
-        importlib.reload(property)
-
-        properties_list.append(property.GetProperty())
-
-        # Return property.py to its original form
-        with open('src/property.py', 'w') as modelfile:
-            modelfile.write(original_file_data)
-
-        importlib.reload(property)
-
-        """ Initial State """
+        # Get the initial state and all of the properties for all k's up to path_length
         if k == 0:
-
-            # Read in given initial states file
-            with open(init_states_file_name, 'r') as initialfile:
-                filedata = initialfile.read()
-
-            # Replace the variable names
-            filedata = filedata.replace('current_s', 's0')
-            filedata = filedata.replace('probability', 'p1')
-            filedata = filedata.replace('next_s', 's1')
-            filedata = filedata.replace('dice_value', 'dv1')
-
-            # Rewrite initial_states.py GetInitialStates() with new initial states
-            with open('src/initial_states.py', 'r') as initialfile:
-                init_file_data = initialfile.read()
-
-            original_file_data = init_file_data
-            init_file_data = init_file_data.replace("#initial_state_info", filedata)
-
-            with open('src/initial_states.py', 'w') as initialfile:
-                initialfile.write(init_file_data)
-
-            importlib.reload(initial_states)
-
-            initial_state = initial_states.GetInitialStates()
-
-            # Return initial_states.py to original form
-            with open('src/initial_states.py', 'w') as initialfile:
-                initialfile.write(original_file_data)
-
-            importlib.reload(initial_states)
-
+            initial_state = GetInitialStates(init_states_file)
+        properties_list.append(GetProperty(k, property_file))
         # Construct the bounded model
         properties = Or(properties_list)
         bounded_model = And(initial_state, path, properties)
@@ -221,7 +231,7 @@ property_prob = (float(last_line.split("=", 1)[1]))
 # or until the designated path_length is reached
 total_probability = 0
 for i in range(1, (path_length+1)):
-    prob_from_step = BMC(PathEncoding(i, model_file_name), i)
+    prob_from_step = BMC(PathEncoding(i, model_file_name), i, property_file_name, init_states_file_name)
     print(i, prob_from_step)
     total_probability += prob_from_step
     if total_probability >= property_prob:
