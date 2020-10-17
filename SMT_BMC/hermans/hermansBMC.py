@@ -144,7 +144,7 @@ def BMC(path, path_length):
         properties = Or(properties_list)
         bounded_model = And(initial_state, path, properties)
 
-    print(bounded_model)
+    # print(bounded_model)
     # Checking the Bounded Model
     solver = Solver()
     if new_model_list:
@@ -158,7 +158,7 @@ def BMC(path, path_length):
     try:  # Only ran if a counter-example was found
         while(True):  # Calculate the probability of all counter examples that can be generated
             solver.check()
-            # print(solver.model())
+            print(solver.model())
             cx_model = solver.model()
 
             # Find probability of the counterexample by multiplying all of the step's probabilities together
