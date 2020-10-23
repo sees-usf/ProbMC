@@ -1,0 +1,13 @@
+B1, b2: boolean
+x: integer[1..2]
+
+Initial: pc1=n1, pc2=n2, b1=b2=false, x either 1 or 2
+
+Pc1 = n1 -> b1:=true; x:=2; pc1 := w1
+Pc1 = w1 && (x=1 || !b2) -> pc1 := c1
+pc1 = c1 -> b1 := false; pc1 := n1 
+Pc2 = n2 -> b2:=true; x:=1; pc2 := w2
+Pc2 = w2 && (x=2 || !b1) -> pc2 := c2
+Pc2 = c2 -> b2 := false; pc2 := n2
+
+Property: p1=c1 && pc2 = c2 (this is not supposed to happen)

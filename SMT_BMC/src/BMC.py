@@ -16,6 +16,7 @@ Note: If a file cannot be found, ensure the program is being ran in the correct 
 from z3 import *
 import model, property, initial_states
 import importlib
+import time
 
 def PathEncoding(path_length, model_file_name):
     """
@@ -56,7 +57,6 @@ def PathEncoding(path_length, model_file_name):
 
     # Construct the path
     path = And(choices_list)
-    # print(path)
     return path
         
 
@@ -67,11 +67,12 @@ def GetProperty(step_number, property_file_name):
         filedata = propertyfile.read()
 
     # Replace the variable names
-    filedata = filedata.replace('current_s', 's{0}'.format(step_number))
-    filedata = filedata.replace('probability', 'p{0}'.format(step_number+1))
-    filedata = filedata.replace('next_s', 's{0}'.format(step_number+1))
-    filedata = filedata.replace('dice_value', 'dv{0}'.format(step_number+1))
-    # Rewrite property.py GetProperty() with new property
+    filedata = filedata.replace('current_s', 's{0}'.format(step_number-1))
+    filedata = filedata.replace('probability', 'p{0}'.format(step_number))
+    filedata = filedata.replace('next_s', 's{0}'.format(step_number))
+    filedata = filedata.replace('dice_value', 'dv{0}'.format(step_number))
+
+    # Rewrite property.py GetProperty() with the new property
     with open('src/property.py', 'r') as propertyfile :
         property_file_data = propertyfile.read()
     
@@ -85,7 +86,7 @@ def GetProperty(step_number, property_file_name):
 
     property_retrieved = property.GetProperty()
 
-    # Return property.py to its original form
+    # Return property.py back to its original form
     with open('src/property.py', 'w') as modelfile:
         modelfile.write(original_file_data)
 
@@ -106,7 +107,7 @@ def GetInitialStates(init_states_file_name):
     filedata = filedata.replace('next_s', 's1')
     filedata = filedata.replace('dice_value', 'dv1')
 
-    # Rewrite initial_states.py GetInitialStates() with new initial states
+    # Rewrite initial_states.py GetInitialStates() with the new initial states
     with open('src/initial_states.py', 'r') as initialfile:
         init_file_data = initialfile.read()
 
@@ -120,7 +121,7 @@ def GetInitialStates(init_states_file_name):
 
     initial_state = initial_states.GetInitialStates()
 
-    # Return initial_states.py to original form
+    # Return initial_states.py back to its original form
     with open('src/initial_states.py', 'w') as initialfile:
         initialfile.write(original_file_data)
 
@@ -152,39 +153,30 @@ def ExcludePath(cx_model, path_length):
                     p_value = numerator/denominator
                     cx_value_list.append(Real(declaration.name())==p_value)
     
-    # Merging the counterexample values into a full counterexample, 
-    # adding them to a list of the total counterexamples, 
-    # and using AND() to merge all the counterexamples together.
     cx = Not(And(cx_value_list))  # Counterexample to begin avoiding
-    reached_cx_list.append(cx)  # Add to list of counterexamples to avoid
-    all_cx_constraints = And(reached_cx_list)  # All of the counterexamples to avoid
+    reached_cx_list.append(cx)  # Add to list of all the counterexamples to avoid
+    all_cx_constraints = And(reached_cx_list)  # And() together all of the counterexamples to avoid
     return all_cx_constraints
 
 
-def BMC(path, path_length, property_file, init_states_file):
+def BMC(path, path_length, property_file, init_states_file, solver):
     """Finds a counterexample model given a path and returns the probability of the path occuring"""
     global reached_cx_list  # Global list of cx's already reached, including prior steps.
 
     # Build the Bounded Model
-    properties_list = []  # List of property constraints after a path_length amount of steps
-    for k in range(path_length):
-        # Get the initial state and all of the properties for all k's up to path_length
-        if k == 0:
-            initial_state = GetInitialStates(init_states_file)
-        properties_list.append(GetProperty(k, property_file))
-        # Construct the bounded model
-        properties = Or(properties_list)
-        bounded_model = And(initial_state, path, properties)
-
-    # print(bounded_model)
-    # Checking the Bounded Model
-    solver = Solver()
+    initial_state = GetInitialStates(init_states_file)
+    property = GetProperty(path_length, property_file)
+    bounded_model = And(initial_state, path)
     if reached_cx_list:
         past_path_constraints = And(reached_cx_list)
         new_bounded_model = And(bounded_model, past_path_constraints)
         solver.add(new_bounded_model)
     else:
         solver.add(bounded_model)
+    solver.push()
+    solver.add(property)
+
+    # Check the Bounded Model
     total_probability = 0
     try:   # Only ran if a counterexample was found
         while(True):  # Calculate the probability of all counterexamples that can be generated
@@ -202,16 +194,10 @@ def BMC(path, path_length, property_file, init_states_file):
                         probability *= numerator/denominator
             
             all_cx_constraints = ExcludePath(cx_model, path_length)
-            new_bounded_model = And(bounded_model, all_cx_constraints)  
-            # print("New Model:")
-            # simplify(new_bounded_model)
-            # print(new_bounded_model)
-            solver.reset()
-            solver.add(new_bounded_model)
-            # print(probability)
+            solver.add(all_cx_constraints)
             total_probability += probability  # Adding the probability of each cx at the given pathlength
-    except:
-        # No more counterexamples can be found
+    except: # No more counterexamples can be found
+        solver.pop()
         return total_probability
 
 
@@ -229,9 +215,10 @@ property_prob = (float(last_line.split("=", 1)[1]))
 
 # Increase the path_length until a counterexample that meets the probability is found
 # or until the designated path_length is reached
+solver = Solver()
 total_probability = 0
 for i in range(1, (path_length+1)):
-    prob_from_step = BMC(PathEncoding(i, model_file_name), i, property_file_name, init_states_file_name)
+    prob_from_step = BMC(PathEncoding(i, model_file_name), i, property_file_name, init_states_file_name, solver)
     print(i, prob_from_step)
     total_probability += prob_from_step
     if total_probability >= property_prob:
