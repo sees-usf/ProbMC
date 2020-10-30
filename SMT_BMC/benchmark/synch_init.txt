@@ -1,0 +1,4 @@
+    r1 = Bool("r1")
+    r2= Bool("r2")
+
+    initial_states = And(r1==False, r2==False)

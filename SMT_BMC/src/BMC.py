@@ -170,24 +170,23 @@ class BMC:
 
         # Check the Bounded Model
         total_probability = 0
-        try:   # Only ran if a counterexample was found
-            while(True):  # Calculate the probability of all counterexamples that can be generated
-                self.solver.check()
-                # print(solver.model())
-                cx_model = self.solver.model()
+        # Calculate the probability of all counterexamples that can be generated
+        while(self.solver.check() == sat): # Runs when a counterexample is found
+            cx_model = self.solver.model()
 
-                # Find probability of the counterexample by multiplying all of the step's probabilities together
-                probability = 1
-                for k in range(self.path_length+1):
-                    for d in cx_model.decls():
-                        if d.name() == "p{0}".format(k):
-                            numerator = float(cx_model[d].numerator_as_long())
-                            denominator = float(cx_model[d].denominator_as_long())
-                            probability *= numerator/denominator
-                
-                all_cx_constraints = self.ExcludePath(cx_model)
-                self.solver.add(all_cx_constraints)
-                total_probability += probability  # Adding the probability of each cx at the given pathlength
-        except: # No more counterexamples can be found
-            self.solver.pop()
-            return total_probability
+            # Find probability of the counterexample by multiplying all of the step's probabilities together
+            probability = 1
+            for k in range(self.path_length+1):
+                for d in cx_model.decls():
+                    if d.name() == "p{0}".format(k):
+                        numerator = float(cx_model[d].numerator_as_long())
+                        denominator = float(cx_model[d].denominator_as_long())
+                        probability *= numerator/denominator
+            
+            all_cx_constraints = self.ExcludePath(cx_model)
+            self.solver.add(all_cx_constraints)
+            total_probability += probability  # Adding the probability of each cx at the given pathlength
+
+        # Runs when no more counterexamples can be found
+        self.solver.pop()
+        return total_probability
