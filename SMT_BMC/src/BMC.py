@@ -1,17 +1,14 @@
 """SMT Bounded Model Checker Class"""
 
 from z3 import *
-import model, property, initial_states
 import importlib
 
 class BMC:
 
-    def __init__(self, solver, path_length, model_file, property_file, init_states_file):
+    def __init__(self, solver, path_length, model):
         self.solver = solver
         self.path_length = path_length
-        self.model_file = model_file
-        self.property_file = property_file
-        self.init_states_file = init_states_file
+        self.model = importlib.import_module(model) # import the model's .py file
         self.path = None # Call PathEncoding() before 
         self.reached_cx_list = [] # List of cx's already reached, including prior steps.
 
@@ -20,111 +17,9 @@ class BMC:
         Returns an encoding of ALL paths with length up to path_length
         This path, starting from initial state and ending at the negation of the property 
         """
-        choices_list = []  # List of choice constraints after a path_length amount of steps
         for k in range(self.path_length):
-            # Read in given model file
-            with open(self.model_file, 'r') as modelfile :
-                filedata = modelfile.read()
-
-            # Replace the variable names
-            filedata = filedata.replace('current_s', 's{0}'.format(k))
-            filedata = filedata.replace('probability', 'p{0}'.format(k+1))
-            filedata = filedata.replace('next_s', 's{0}'.format(k+1))
-            filedata = filedata.replace('dice_value', 'dv{0}'.format(k+1))
-
-            # Rewrite model.py GetStep() with new model
-            with open('src/model.py', 'r') as modelfile :
-                model_file_data = modelfile.read()
-            
-            original_file_data = model_file_data
-            model_file_data = model_file_data.replace('#model_info', filedata)
-            
-            with open('src/model.py', 'w') as modelfile:
-                modelfile.write(model_file_data)
-
-            importlib.reload(model)
-
-            choices_list.append(model.GetStep())
-
-            # Return model.py to orignal form
-            with open('src/model.py', 'w') as modelfile:
-                modelfile.write(original_file_data)
-
-            importlib.reload(model)
-
-        # Construct the path
-        self.path = And(choices_list)
+            self.path = And(self.model.GetStep(k))
         return self.path
-
-
-    def GetProperty(self):
-        """Returns the property from the property_file_name found at the given path_length"""
-        # Read in given property file
-        with open(self.property_file, 'r') as propertyfile:
-            filedata = propertyfile.read()
-
-        # Replace the variable names
-        filedata = filedata.replace('current_s', 's{0}'.format(self.path_length-1))
-        filedata = filedata.replace('probability', 'p{0}'.format(self.path_length))
-        filedata = filedata.replace('next_s', 's{0}'.format(self.path_length))
-        filedata = filedata.replace('dice_value', 'dv{0}'.format(self.path_length))
-
-        # Rewrite property.py GetProperty() with the new property
-        with open('src/property.py', 'r') as propertyfile :
-            property_file_data = propertyfile.read()
-        
-        original_file_data = property_file_data
-        property_file_data = property_file_data.replace('#property_info', filedata)
-
-        with open('src/property.py', 'w') as propertyfile:
-            propertyfile.write(property_file_data)
-
-        importlib.reload(property)
-
-        property_retrieved = property.GetProperty()
-
-        # Return property.py back to its original form
-        with open('src/property.py', 'w') as modelfile:
-            modelfile.write(original_file_data)
-
-        importlib.reload(property)
-
-        return property_retrieved
-
-    def GetInitialStates(self):
-        """Returns the initial state from init_states_file_name"""
-        # Read in given initial states file
-        with open(self.init_states_file, 'r') as initialfile:
-            filedata = initialfile.read()
-
-        # Replace the variable names
-        filedata = filedata.replace('current_s', 's0')
-        filedata = filedata.replace('probability', 'p1')
-        filedata = filedata.replace('next_s', 's1')
-        filedata = filedata.replace('dice_value', 'dv1')
-
-        # Rewrite initial_states.py GetInitialStates() with the new initial states
-        with open('src/initial_states.py', 'r') as initialfile:
-            init_file_data = initialfile.read()
-
-        original_file_data = init_file_data
-        init_file_data = init_file_data.replace("#initial_state_info", filedata)
-
-        with open('src/initial_states.py', 'w') as initialfile:
-            initialfile.write(init_file_data)
-
-        importlib.reload(initial_states)
-
-        initial_state = initial_states.GetInitialStates()
-
-        # Return initial_states.py back to its original form
-        with open('src/initial_states.py', 'w') as initialfile:
-            initialfile.write(original_file_data)
-
-        importlib.reload(initial_states)
-
-        return initial_state
-
 
     def ExcludePath(self, cx_model):
         """
@@ -152,12 +47,11 @@ class BMC:
         all_cx_constraints = And(self.reached_cx_list)  # And() together all of the counterexamples to avoid
         return all_cx_constraints
 
-
     def BMC(self):
         """Finds a counterexample model given a path and returns the probability of the path occuring"""
         # Build the Bounded Model
-        initial_state = self.GetInitialStates()
-        property = self.GetProperty()
+        initial_state = self.model.GetInitialStates()
+        property = self.model.GetProperty(self.path_length)
         bounded_model = And(initial_state, self.path)
         if self.reached_cx_list:
             past_path_constraints = And(self.reached_cx_list)

@@ -17,22 +17,15 @@ from z3 import *
 from BMC import *
 
 # Obtain information about the model to check and what to check for.
-model_file_name = property_file_name = init_states_file_name = "benchmark/"
-model_file_name += input("Model file name (include .txt): ")
-property_file_name += input("Property file name (include .txt): ")
-init_states_file_name += input("Initial states file name (include .txt): ")
+model = input("Model name (exclude .py): ")
 path_length = int(input("Provide a path length: "))
-
-# Get the property probability threshold
-with open(property_file_name, 'r') as property_file:
-    last_line = property_file.readlines()[-1]
-property_prob = (float(last_line.split("=", 1)[1]))
+property_prob = int(input("Provide a probability to reach: "))
 
 # Increase the path_length until a counterexample that meets the probability is found
 # or until the designated path_length is reached
 solver = Solver()
 total_probability = 0
-bmc = BMC(solver, path_length, model_file_name, property_file_name, init_states_file_name)
+bmc = BMC(solver, path_length, model)
 for i in range(1, (path_length+1)):
     bmc.path_length = i
     bmc.PathEncoding()
