@@ -24,7 +24,7 @@ def GetStep(step):
     choice7 = And(current_state==6, (Or(And(probability==0.5, next_state==2), And(probability==0.5, dice_value==6, next_state==7))))
     choice8 = And(current_state==7, next_state==7, dice_value==0)
 
-    step = And(ranges, Or(choice1, choice2, choice3, choice4, choice5, choice6, choice7, choice8))
+    step = And(ranges, Or(choice1, choice2, choice3, choice4, choice5, choice6, choice7, choice8)) # OR()ing choices together = Asynchrounous
 
     return step
 
@@ -34,8 +34,6 @@ def GetProperty(path_length):
     next_state = Int("s{0}".format(path_length))
 
     property = (And(next_state==7, dice_value==1))  # As of right now, we have to negate the property ourselves
-
-    property_probability = 1
 
     return property
 

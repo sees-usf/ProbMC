@@ -31,16 +31,15 @@ class BMC:
             cx_value_list = []
             for declaration in cx_model.decls():
                 # print ("%s = %s" % (d.name(), cx_model[d]))
-                if declaration.name() == "p{0}".format(k):
-                    pass
-                else:
-                    try:  # For Integer Values
-                        cx_value_list.append(Int(declaration.name())==cx_model[declaration].as_long())
-                    except:  # For Real Values
-                        numerator = float(cx_model[declaration].numerator_as_long())
-                        denominator = float(cx_model[declaration].denominator_as_long())
-                        p_value = numerator/denominator
-                        cx_value_list.append(Real(declaration.name())==p_value)
+                if is_int_value(cx_model[declaration]):
+                    cx_value_list.append(Int(declaration.name())==cx_model[declaration].as_long())
+                elif is_true(cx_model[declaration]) or is_false(cx_model[declaration]):
+                    cx_value_list.append(Bool(declaration.name())==cx_model[declaration])
+                else:  # For Real Values
+                    numerator = float(cx_model[declaration].numerator_as_long())
+                    denominator = float(cx_model[declaration].denominator_as_long())
+                    p_value = numerator/denominator
+                    cx_value_list.append(Real(declaration.name())==p_value)
         
         cx = Not(And(cx_value_list))  # Counterexample to begin avoiding
         self.reached_cx_list.append(cx)  # Add to list of all the counterexamples to avoid
@@ -64,6 +63,7 @@ class BMC:
 
         # Check the Bounded Model
         total_probability = 0
+        print(self.solver)
         # Calculate the probability of all counterexamples that can be generated
         while(self.solver.check() == sat): # Runs when a counterexample is found
             cx_model = self.solver.model()
