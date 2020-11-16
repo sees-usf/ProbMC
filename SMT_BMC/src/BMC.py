@@ -63,7 +63,7 @@ class BMC:
 
         # Check the Bounded Model
         total_probability = 0
-        print(self.solver)
+
         # Calculate the probability of all counterexamples that can be generated
         while(self.solver.check() == sat): # Runs when a counterexample is found
             cx_model = self.solver.model()
