@@ -11,20 +11,28 @@ tr1 ... add additional constraints (Ex. pc2 should be the same in current and ne
 tr2 .. etc., then OR them together
 
 Pc1 = n1 -> b1:=true; x:=2; pc1 := w1
-Pc1 = w1 && (x=1 || !b2) -> pc1 := c1
+Pc1 = w1 && (x=1 || !b2) -> pc1 := c1 // I switched this b2 with b1 in the transition relations
 pc1 = c1 -> b1 := false; pc1 := n1 
 Pc2 = n2 -> b2:=true; x:=1; pc2 := w2
-Pc2 = w2 && (x=2 || !b1) -> pc2 := c2
+Pc2 = w2 && (x=2 || !b1) -> pc2 := c2 // I switched this b1 with b2 in the transition relations
 Pc2 = c2 -> b2 := false; pc2 := n2
 
 b1, b2 = Boolean -> Change
 x = Int
 pc1, pc2 = Int() -> Change
-w = 0
-c = 1
-n = 2
+w = 1
+c = 2
+n = 0
 
 Property: p1=c1 && pc2 = c2 (this is not supposed to happen)
+
+Running through a path...
+    # 1st... Hits choice 1... Now... pc1.1=w, x.1=2, b1.1=True
+    # 2nd... Hits choice 2... x.1!=1 and !b1 are both False, making the OR statement false, causing the transition to fail.
+    #        Hits choice 4... Now... pc2.2=w, x.2=1, b2.2=True
+    # 3rd... Hits choice 2... x.2==1, making the OR statement true... Now... pc1.3=c, b1.3=True, x.3=1
+    # 4th... Hits choice 5... 
+
 """
 #####################################################################
 """ Asynch Module - Module to hold information regarding the asynchronous model.
@@ -57,13 +65,11 @@ def GetStep(step):
     keep_1 = And(current_pc1==next_pc1, current_b1==next_b1)
     keep_2 = And(current_pc2==next_pc2, current_b2==next_b2)
     choice1 = And(current_pc1==n, next_b1==True, next_x==2, next_pc1==w, probability==0.5)
-    choice2 = And(current_pc1==w, Or(current_x==1, Not(current_b2)), next_pc1==c, probability==0.5)
-    choice3 = And(current_pc1==c, next_b1==False, next_pc1==n, probability==0.5)
+    choice2 = And(current_pc1==w, Or(current_x==1, Not(current_b1)), next_pc1==c, probability==0.5, next_x==current_x)
+    choice3 = And(current_pc1==c, next_b1==False, next_pc1==n, probability==0.5, next_x==current_x)
     choice4 = And(current_pc2==n, next_b2==True, next_x==1, next_pc2==w, probability==0.5)
-    choice5 = And(current_pc2==w, Or(current_x==2, Not(current_b1)), next_pc2==c, probability==0.5)
-    choice6 = And(current_pc2==c, next_b2==False, next_pc2==n, probability==0.5)
-
-    # Move probability into Implication 
+    choice5 = And(current_pc2==w, Or(current_x==2, Not(current_b2)), next_pc2==c, probability==0.5, next_x==current_x)
+    choice6 = And(current_pc2==c, next_b2==False, next_pc2==n, probability==0.5, next_x==current_x)
 
     step = And(ranges, Or(And(Or(choice1, choice2, choice3), keep_2), And(Or(choice4, choice5, choice6), keep_1)))
 
@@ -76,6 +82,7 @@ def GetProperty(path_length):
     c = Int("c")
 
     property = And(next_pc1==c, next_pc2==c) # Shouldn't happen
+    # property = And(next_pc1==c, next_pc2==1) # Should happen on the third step
 
     return property
 
