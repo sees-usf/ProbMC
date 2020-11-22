@@ -1,4 +1,4 @@
-""" Use this template to build your own model! """
+""" Use this template to build your own model! You can also check out some of the other modules for reference."""
 
 """ {Model_Name} Module - Module to hold information regarding the {model_name} model.
     Contains information on the following:
