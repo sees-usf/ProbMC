@@ -5,21 +5,38 @@ import importlib
 
 class BMC:
 
-    def __init__(self, solver, path_length, model):
-        self.solver = solver
-        self.path_length = path_length
+    def __init__(self, path_length, model, property_prob):
+        self.solver = Solver() # Holds all the constraints that define a bounded model
+        self.path_length = path_length # Max number of steps that can be taken to find the criteria-fitting cx
         self.model = importlib.import_module(model) # import the model's .py file
-        self.path = None # Call PathEncoding() before 
+        self.property_prob = property_prob # The probabily that must be met to consider a cx as found
+        self.path = None # PathEncoding() creates the path
         self.reached_cx_list = [] # List of cx's already reached, including prior steps.
+        self.solver.add(self.model.GetInitialStates()) # Add initial states to the bounded model definition
+        # Increase the path_length until a counterexample that meets property_prob is found
+        # or until the designated path_length is reached
+        total_probability = 0
+        for i in range(1, (self.path_length+1)):
+            self.path_length = i
+            self.PathEncoding()
+            prob_from_step = self.Check()
+            print(i, prob_from_step)
+            total_probability += prob_from_step
+            if total_probability >= property_prob:
+                print("Yes, a counterexample was found at a probability greater than {}.".format(property_prob))
+                break
+        if total_probability < property_prob:
+            print("No, a counterexample was not found at a probability greater than {}.".format(property_prob))
+
+        print("Total probability: {}".format(total_probability))
+
 
     def PathEncoding(self):
         """
-        Returns an encoding of ALL paths with length up to path_length
-        This path, starting from initial state and ending at the negation of the property 
+        Adds an encoding of the path with length a length of path_length, whic is incremented in __init__
         """
-        for k in range(self.path_length):
-            self.path = And(self.model.GetStep(k))
-        return self.path
+        self.path = self.model.GetStep(self.path_length-1)
+        self.solver.add(self.path)
 
     def ExcludePath(self, cx_model):
         """
@@ -46,19 +63,14 @@ class BMC:
         all_cx_constraints = And(self.reached_cx_list)  # And() together all of the counterexamples to avoid
         return all_cx_constraints
 
-    def BMC(self):
+    def Check(self):
         """Finds a counterexample model given a path and returns the probability of the path occuring"""
-        # Build the Bounded Model
-        initial_state = self.model.GetInitialStates()
-        property = self.model.GetProperty(self.path_length)
-        bounded_model = And(initial_state, self.path)
+        # Initial state was added in __init__, the path was added through PathEncoding(), so the bounded model
+        # only needs any prior counterexamples found and the property to be added as constraints.
         if self.reached_cx_list:
-            past_path_constraints = And(self.reached_cx_list)
-            new_bounded_model = And(bounded_model, past_path_constraints)
-            self.solver.add(new_bounded_model)
-        else:
-            self.solver.add(bounded_model)
-        self.solver.push()
+            self.solver.add(self.reached_cx_list)
+        self.solver.push() # Saves initial states, path, and past counterexamples. These won't be removed on solver.pop()
+        property = self.model.GetProperty(self.path_length-1) # Return property regarding the most recent step
         self.solver.add(property)
 
         # Check the Bounded Model
@@ -77,10 +89,13 @@ class BMC:
                         denominator = float(cx_model[d].denominator_as_long())
                         probability *= numerator/denominator
             
-            all_cx_constraints = self.ExcludePath(cx_model)
-            self.solver.add(all_cx_constraints)
+            self.solver.add(self.ExcludePath(cx_model))
             total_probability += probability  # Adding the probability of each cx at the given pathlength
 
         # Runs when no more counterexamples can be found
-        self.solver.pop()
+        self.solver.pop() # Removes the property to replace with a fresh one later, when Check() is called again
         return total_probability
+
+    def GetCounterExample():
+        pass
+        # if counter example found, user can query to get the cx 

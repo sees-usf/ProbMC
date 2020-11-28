@@ -28,13 +28,13 @@ def GetStep(step):
 
     return step
 
-def GetProperty(path_length):
+def GetProperty(step):
     """ Property """
-    next_r1 = Bool("r1.{0}".format(path_length))
-    next_r2 = Bool("r2.{0}".format(path_length))
-    x = Bool("x.{0}".format(path_length))
-    current_r1 = Bool("r1.{0}".format(path_length - 1))
-    current_r2 = Bool("r2.{0}".format(path_length - 1))
+    next_r1 = Bool("r1.{0}".format(step+1))
+    next_r2 = Bool("r2.{0}".format(step+1))
+    x = Bool("x.{0}".format(step+1))
+    current_r1 = Bool("r1.{0}".format(step))
+    current_r2 = Bool("r2.{0}".format(step))
 
     property = And(current_r1==True, current_r2==False, x==True, next_r1==False, next_r2==True)  # As of right now, we have to negate the property ourselves
     # Never happens: And(next_r1==True, next_r2==True)

@@ -76,11 +76,11 @@ def GetStep(step):
 
     return step
 
-def GetProperty(path_length):
+def GetProperty(step):
     """ Property """
     # This is where the property the program is attempting to find a counterexample for is defined.
     # First, initiate any variables that are needed for the property.
-    # [variable name 1] = [Int, Bool, or Real]('[variable name 2]{0}'.format([path_length or path_length-1]))
+    # [variable name 1] = [Int, Bool, or Real]('[variable name 2]{0}'.format([step or step+1]))
     #   [variable name 1]: The name used while you are building the property in this file.
     #                      Note that if the variable has a current and a next state, two variables will
     #                      have to be named with unique variable names.
@@ -90,16 +90,16 @@ def GetProperty(path_length):
     #                      This name must also match the ones from the transition relations defined above.
     #   [Int, Bool, or Real]: Choose whether this variable is of integer, boolean, or real type.
     #                         This must match the typing the variable is assigned to in GetStep()
-    #   [path_length or path_length-1]: Use 'path_length-1' if the variable is defined in GetStep() through 'step'
-    #                                   Use 'path_length' if the variable is defined in GetStep() through 'step+1'
+    #   [step or step+1]: Use 'step' if the variable is defined in GetStep() through 'step'
+    #                     Use 'step+1' if the variable is defined in GetStep() through 'step+1'
     # After this, set a variable named 'property' equal to the model's property condition. Build this condition
     # through the z3 functions described in GetStep(). This solver currently does not negate the property on its own,
     # so you will have to negate the property manually. Once your conditions are set, wrap around the whole condition
     # like so: Not([property we want to find counter examples for]).
     # View the example below for a property in which, (next_state != 7) || (dice_value != 1).
     # Once a property is set, add a line, "return property" to finish this function, GetProperty().
-    dice_value = Int("dv{0}".format(path_length))
-    next_state = Int("s{0}".format(path_length))
+    dice_value = Int("dv{0}".format(step+1))
+    next_state = Int("s{0}".format(step+1))
 
     property = Not(Or(next_state!=7, dice_value!=1))
 

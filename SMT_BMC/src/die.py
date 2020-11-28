@@ -28,10 +28,10 @@ def GetStep(step):
 
     return step
 
-def GetProperty(path_length):
+def GetProperty(step):
     """ Property """
-    dice_value = Int("dv{0}".format(path_length))
-    next_state = Int("s{0}".format(path_length))
+    dice_value = Int("dv{0}".format(step+1))
+    next_state = Int("s{0}".format(step+1))
 
     property = (And(next_state==7, dice_value==1))  # As of right now, we have to negate the property ourselves
 
