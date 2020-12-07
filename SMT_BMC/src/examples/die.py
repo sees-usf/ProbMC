@@ -3,6 +3,12 @@
     (1) Transition Relations
     (2) Property
     (3) Initial State
+
+    This model emulates a 6-sided die through coin tosses (50% probability per state transition).
+    SMT_BMC/references has a .jpg image of the model for better visualization.
+
+    See this link for more information:
+        https://www.prismmodelchecker.org/tutorial/die.php
 """
 
 from z3 import *

@@ -3,6 +3,29 @@
     (1) Transition Relations
     (2) Property
     (3) Initial State
+
+    In asynchronous models, when more than one transition is enabled during a step, only one can occur. 
+    Below is another representation of this model. 
+
+    ====================================================
+    B1, b2: boolean
+    x: integer[1..2]
+
+    Initial: pc1=n1, pc2=n2, b1=b2=false, x either 1 or 2
+
+    pc1 = n1 -> b1:=true; x:=2; pc1 := w1
+    pc1 = w1 && (x=1 || !b1) -> pc1 := c1
+    pc1 = c1 -> b1 := false; pc1 := n1 
+    pc2 = n2 -> b2:=true; x:=1; pc2 := w2
+    pc2 = w2 && (x=2 || !b2) -> pc2 := c2
+    pc2 = c2 -> b2 := false; pc2 := n2
+
+    Property: p1=c1 && pc2 = c2 (this is not supposed to happen)
+
+    Notes:
+    Transition relations are defined as x-> y or x <-> y where x represents current states, 
+    while y represents the next states.
+    ====================================================
 """
 
 from z3 import *

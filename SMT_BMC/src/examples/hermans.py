@@ -3,6 +3,14 @@
     (1) Transition Relations
     (2) Property
     (3) Initial State
+
+    This model represents Herman's self-stabilization algorithm. In this example, 3 processes, x1,
+    x2, and x3, are represented in a ring formation. If the processes' value does not matches that 
+    of its neighbor, the algorithm will force the neighbors to match. If the neighbors do match,
+    then the algorithm will let the process choose to be any boolean value.
+
+    See this link for more information:
+        https://github.com/prismmodelchecker/prism-benchmarks/blob/master/models/dtmcs/herman/herman3.pm
 """
 
 from z3 import *
@@ -39,8 +47,8 @@ def GetProperty(step):
     next_x3 = Bool("x3.{0}".format(step+1))
 
     property = (And(next_x1==False, next_x2==True, next_x3==False))  # As of right now, we have to negate the property ourselves
-    # Note: next_x1==True, next_x2==False, and next_x3==True on step 2 given init of (1 1 0)
-    #       next_x1==False, next_x2==True, and next_x3==False on step 3 given init of (1 1 0)
+    # Note: Probability returned 1st on step 2 given property next_x1==True, next_x2==False, and next_x3==True and init of (1 1 0)
+    #       Probability returned 1st on step 3 given property next_x1==False, next_x2==True, and next_x3==False and init of (1 1 0)
 
     return property
 
@@ -57,6 +65,6 @@ def GetInitialStates():
     # We don't use this for testing because if all the x's are True, the new x's can be any value rather than 1 strict value,
     # making testing difficult.
     initial_states = And(current_x1==True, current_x2==True, current_x3==False)
-    # FIXME Issue: initial_states = True returns total probability of 2.0 at k = 1
+    # FIXME: Issue: initial_states = True returns total probability of 2.0 at k = 1
 
     return initial_states

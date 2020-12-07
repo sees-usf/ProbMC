@@ -3,6 +3,26 @@
     (1) Transition Relations
     (2) Property
     (3) Initial State
+
+    In a synchronous model, all transitions are executed at the same time. Below is another way
+    to write out this model. A logisim file, synch.circ, can be found in SMT_BMC/references for
+    testing this model.
+    
+    ====================================================
+      All variables are boolean
+
+      Initial: r1=r2 = 0, x either 0 or 1.
+
+      x xor r1 <-> r1
+      (!x && r2) || (r1 && x) <-> r2
+
+      Property: r1=r2=1 (this is not supposed to happen)
+
+      Notes: 
+      x <-> y means x -> y and y -> x
+      Transition relations are defined as x-> y or x <-> y where x represents current states, 
+      while y represents the next states.
+    ====================================================
 """
 
 from z3 import *

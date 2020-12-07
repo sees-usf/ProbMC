@@ -11,6 +11,3 @@ Property: r1=r2=1 (this is not supposed to happen)
 
 
 Note: x <-> y means x -> y and y -> x
-
-*For testing if synch is done right
-**Check this one first
