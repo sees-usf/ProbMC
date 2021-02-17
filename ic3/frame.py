@@ -1,5 +1,4 @@
 from z3 import *
-from models import *
 
 
 class frame:
