@@ -9,6 +9,10 @@ def getProperty(k):
     return P
 
 
+def getLiterals():
+    return ["a", "b"]
+
+
 def getTransition(k):
     # Defining variables
     a = Bool("a{0}".format(k))

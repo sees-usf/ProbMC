@@ -51,7 +51,7 @@ def ic3(model):
         badStateSolver.add(Not(currFrame.PPrime))
 
         while badStateSolver.check() == sat:
-            sk = retrieveSk(currFrame, badStateSolver)
+            sk = retrieveSk(currFrame, badStateSolver, model.getLiterals())
             print("There is a bad state: ", sk)
             result, frames = findCEX(sk, currFrame, frames, model)
             if result:
@@ -59,17 +59,11 @@ def ic3(model):
             break
 
         # If frames match, its the end of ic3
-        # TODO mention this issue
         equivChecker = Solver()
-        tempCurrFrame = createPrimeVersion(currFrame.clauses, currFrame.k - 2)
+        tempCurrFrame = createPrimeVersion(currFrame.clauses, model.getLiterals(), currFrame.k, -1)
         equivChecker.add(Not(prevFrame.clauses == tempCurrFrame))
-
-        # equivChecker.add(Not(prevFrame.clauses == currFrame.clauses))
-        # print(prevFrame.clauses, currFrame.clauses)
         if equivChecker.check() == unsat:
             return False
-        # else:
-        #    print("Not the same", equivChecker.model())
 
         # PREPS FOR NEXT ITERATION
         k += 1
@@ -85,30 +79,35 @@ def ic3(model):
 
 
 # Retrieves a bad state s from Fk
-def retrieveSk(Fk, skSolver):
+def retrieveSk(Fk, skSolver, literals):
     # Input: Transition relation ANDED w/ Not P, the current frame
     # Output: Returns a bad state
 
     model = skSolver.model()
-    print(skSolver.model())
+    #print(skSolver.model())
 
     a = Bool("a{0}".format(Fk.k))
     b = Bool("b{0}".format(Fk.k))
 
-    # TODO needs to be reworked for larger models
-    if not model.eval(a) and not model.eval(b):
-        sk = And(Not(a), Not(b))
-    elif not model.eval(a):
-        sk = And(Not(a), b)
-    elif not model.eval(b):
-        sk = And(a, Not(b))
-    else:
-        sk = And(a, b)
+    sk = Bool(1)
+    for i in range(0, len(literals)):
+        tempBool = Bool((str(literals[i]) + "{0}").format(Fk.k))
+        if i == 0:
+            if model.eval(tempBool):
+                sk = tempBool
+            else:
+                sk = Not(tempBool)
+        else:
+            if model.eval(tempBool):
+                sk = And(sk, tempBool)
+            else:
+                sk = And(sk, Not(tempBool))
 
+    sk = simplify(sk)
     checker1 = Solver()
     checker1.add(Implies(Not(Fk.P), And(Fk.T, sk)))
     checker2 = Solver()
-    checker2.add(And(Fk.clauses, Fk.T, createPrimeVersion(sk, Fk.k+1)))
+    checker2.add(And(Fk.clauses, Fk.T, createPrimeVersion(sk, literals, Fk.k, 2)))
 
     if checker1.check() == unsat or checker2.check() == unsat:
         raise ValueError("Something wrong with sk")
@@ -132,19 +131,17 @@ def findCEX(sk, Fk, frames, model):
         # (Fk-1 ^ T ^ sk')
         currSolver.add(frames[Fk.k - 1].clauses)
         currSolver.add(frames[Fk.k - 1].T)
-        currSolver.add(createPrimeVersion(sk, Fk.k))
+        currSolver.add(createPrimeVersion(sk, model.getLiterals(), Fk.k, 1))
 
-        # TODO figure out model 2
         while currSolver.check() == sat:
-            sk_1 = retrieveSk(frames[Fk.k - 1], currSolver)
+            sk_1 = retrieveSk(frames[Fk.k - 1], currSolver, model.getLiterals())
             print("The previous bad state is", sk_1)
-            result, frames = findCEX(sk_1, frames[Fk.k-1], frames, model)
+            result, frames = findCEX(sk_1, frames[Fk.k - 1], frames, model)
             if result:
                 return result, frames
 
         # Blocks the clause
-        #frames = pushForward(Not(sk), Fk, frames)
-
+        # frames = pushForward(Not(sk), Fk, frames)
 
     return False, frames
 
@@ -153,18 +150,14 @@ def pushForward(c, Fk, frames):
     currChecker = Solver()
 
 
-
-def createPrimeVersion(express, k):
-    expressSolver = Solver()
-    expressSolver.add(express)
-    expressSolver.check()
-    modelExpress = expressSolver.model()
-    modelExpress = list(modelExpress)
-
-    tempExpress = substitute(express, (Bool(str(modelExpress[0])), Bool("a{0}".format(k + 1))))
-    tempExpress = substitute(tempExpress, (Bool(str(modelExpress[1])), Bool("b{0}".format(k + 1))))
-
-    return tempExpress
+def createPrimeVersion(express, literals, k, increment):
+    for x in literals:
+        tempStr = str(x) + "{0}"
+        try:
+            express = substitute(express, (Bool(tempStr.format(k)), Bool(tempStr.format(k + increment))))
+        except:
+            continue
+    return express
 
 
 # Prints Result
@@ -187,3 +180,6 @@ printResult(ic3(importlib.import_module("sampleModel2")))
 
 print("\n**MODEL 3**")
 printResult(ic3(importlib.import_module("sampleModel3")))
+
+print("\n**MODEL 4**")
+printResult(ic3(importlib.import_module("sampleModel4")))
