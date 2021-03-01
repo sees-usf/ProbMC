@@ -30,6 +30,8 @@ def getTransition(k):
     st3 = And(Not(a), b, c)
     st4 = And(a, Not(b), Not(c))
     st5 = And(a, Not(b), c)
+    st6 = And(a, b, Not(c))
+    st7 = And(a, b, c)
 
     # Defining states - prime
     st0_prime = And(Not(aPrime), Not(bPrime), Not(cPrime))
@@ -38,21 +40,15 @@ def getTransition(k):
     st3_prime = And(Not(aPrime), bPrime, cPrime)
     st4_prime = And(aPrime, Not(bPrime), Not(cPrime))
     st5_prime = And(aPrime, Not(bPrime), cPrime)
+    st6_prime = And(aPrime, bPrime, Not(cPrime))
+    st7_prime = And(aPrime, bPrime, cPrime)
 
-    #T = And(Implies(st0, Or(st1_prime, st5_prime)),
-    #        Implies(st1, Or(st0_prime, st2_prime, st4_prime)),
-    #        Implies(st2, st3_prime),
-    #        Implies(st3, st4_prime),
-    #        Implies(st4, st0_prime),
-    #        Implies(st5, Or(st0_prime, st4_prime)),
-    #        )
-
-    T = Or(And(st0, st1_prime), And(st0, st5_prime),
+    T = Or(And(st0, st1_prime),
            And(st1, st0_prime), And(st1, st2_prime), And(st1, st4_prime),
            And(st2, st3_prime),
            And(st3, st4_prime),
-           And(st4, st0_prime),
-           And(st5, st0_prime), And(st5, st4_prime))
+           And(st5, st4_prime), And(st5, st7_prime),
+           And(st6, st7_prime))
 
     return T
 

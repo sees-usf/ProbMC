@@ -53,7 +53,7 @@ def ic3(model):
         while badStateSolver.check() == sat:
             sk = retrieveSk(currFrame, badStateSolver, model.getLiterals())
             print("There is a bad state: ", sk)
-            result, frames = findCEX(sk, currFrame, frames, model)
+            result, frames, currFrame = findCEX(sk, currFrame, frames, model)
             if result:
                 return True
             break
@@ -85,9 +85,6 @@ def retrieveSk(Fk, skSolver, literals):
 
     model = skSolver.model()
     #print(skSolver.model())
-
-    a = Bool("a{0}".format(Fk.k))
-    b = Bool("b{0}".format(Fk.k))
 
     sk = Bool(1)
     for i in range(0, len(literals)):
@@ -121,34 +118,60 @@ def findCEX(sk, Fk, frames, model):
 
     # We reached init
     if Fk.k == 0:
-        currSolver.add(Implies(sk, Fk.clauses))
+        currSolver.add(Implies(sk, model.getInit()))
         if currSolver.check():
-            return True, frames
+            return True, frames, Fk
         else:
-            return False, frames
+            return False, frames, Fk
     else:
         # Finds a bad state in the previous frame
         # (Fk-1 ^ T ^ sk')
         currSolver.add(frames[Fk.k - 1].clauses)
-        currSolver.add(frames[Fk.k - 1].T)
+        #currSolver.add(frames[Fk.k - 1].T)
+        currSolver.add(Fk.T)
         currSolver.add(createPrimeVersion(sk, model.getLiterals(), Fk.k, 1))
 
         while currSolver.check() == sat:
+            print(Fk.k, frames[Fk.k-1].clauses)
             sk_1 = retrieveSk(frames[Fk.k - 1], currSolver, model.getLiterals())
             print("The previous bad state is", sk_1)
-            result, frames = findCEX(sk_1, frames[Fk.k - 1], frames, model)
+            result, frames, Fk = findCEX(sk_1, frames[Fk.k - 1], frames, model)
             if result:
-                return result, frames
+                return result, frames, Fk
 
         # Blocks the clause
-        # frames = pushForward(Not(sk), Fk, frames)
+        result, frames, Fk = pushForward(Not(sk), Fk, frames, model)
+        if result:
+            return True, frames, Fk
+        #frames = pushBackward(Not(sk), Fk, frames)
 
-    return False, frames
+    return False, frames, Fk
 
 
-def pushForward(c, Fk, frames):
+def pushForward(c, Fk, frames, model):
+    if Fk.k > len(frames): # Reached the most recent frame
+        return False, frames
+
     currChecker = Solver()
+    currChecker.add(c)
+    currChecker.add(createPrimeVersion(Not(c), model.getLiterals(), Fk.k, 1))
+    currChecker.add(Fk.clauses)
+    currChecker.add(Fk.T)
+    if currChecker.check() == sat:
+        sj = retrieveSk(Fk, currChecker, model.getLiterals())
+        result, frames = findCEX(sj, Fk, frames, model)
+        if result:
+            return True, frames
+    else:
+        Fk.clauses = simplify(And(Fk.clauses, c))
+        if Fk.k == len(frames):
+            return False, frames, Fk
+        return pushForward(c, frames[Fk.k+1], frames, model)
 
+
+
+def pushBackward(c, Fk, frames):
+    currChecker = Solver()
 
 def createPrimeVersion(express, literals, k, increment):
     for x in literals:
@@ -183,3 +206,9 @@ printResult(ic3(importlib.import_module("sampleModel3")))
 
 print("\n**MODEL 4**")
 printResult(ic3(importlib.import_module("sampleModel4")))
+
+print("\n**MODEL 5**")
+printResult(ic3(importlib.import_module("sampleModel5")))
+
+print("\n**MODEL 6**")
+printResult(ic3(importlib.import_module("sampleModel6")))
