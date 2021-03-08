@@ -8,4 +8,12 @@ class frame:
         self.T = model.getTransition(inputK)
         self.P = model.getProperty(inputK)
         self.PPrime = model.getProperty(inputK+1)
+        self.solver = Solver()  # Each solver contains the clauses and the transition
+        self.solver.add(self.clauses)
+        self.solver.add(self.T)
+
+    # Updates the solver to work with new clauses
+    def updateSolver(self):
         self.solver = Solver()
+        self.solver.add(self.clauses)
+        self.solver.add(self.T)
