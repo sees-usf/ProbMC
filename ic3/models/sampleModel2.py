@@ -32,7 +32,7 @@ def getTransition(k):
     st2_prime = And(aPrime, bPrime)
     st3_prime = And(aPrime, Not(bPrime))
 
-    T = And(Implies(st0, Or(st1_prime, st2_prime, st3_prime)),
+    T = And(Implies(st0, Or(st1_prime, st3_prime)),
             Implies(st1, Or(st0_prime, st2_prime)),
             Implies(st3, st0_prime)
             )
