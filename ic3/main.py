@@ -155,6 +155,7 @@ def findCEX(sk, Fk, frames, model):
 
 
 def pushForward(c, Fk, frames, model):
+    print("pushForward")
     if Fk.k > len(frames):  # Reached the most recent frame
         return False, frames
 
@@ -168,9 +169,12 @@ def pushForward(c, Fk, frames, model):
             return True, frames, Fk
     else:
         Fk.clauses = simplify(And(Fk.clauses, c))
-        if Fk.k == len(frames):
+        #print(Fk.k, "Len:", len(frames), Fk.clauses)
+        if Fk.k + 1 >= len(frames):
             return False, frames, Fk
-        return pushForward(c, frames[Fk.k+1], frames, model)
+        else:
+            #print("In else statement", Fk.k, len(frames))
+            return pushForward(c, frames[Fk.k + 1], frames, model)
 
 
 # TO be done
@@ -211,3 +215,6 @@ printResult(ic3(importlib.import_module("sampleModel5")))
 
 print("\n**MODEL 6**")
 printResult(ic3(importlib.import_module("sampleModel6")))
+
+print("\n**MODEL 7**")
+printResult(ic3(importlib.import_module("sampleModel7")))
