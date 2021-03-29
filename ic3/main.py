@@ -34,6 +34,7 @@ def ic3(model):
 
     # BACKWARDS SEARCH
     i = 0  # Var for testing
+    cex = []
     while True:
         print("\nCurr frame", currFrame.index, ": ", currFrame.clauses, "\nPrev Frame", prevFrame.index, ": ", prevFrame.clauses)
         # Checks for a bad stat
@@ -45,7 +46,8 @@ def ic3(model):
             print("There is a bad state in frame", currFrame.index , "(BS): ", sk)
 
             # Tries to find a counterexample
-            result, frames, currFrame = findCEX(sk, currFrame, frames, model)
+            cex.append(sk)
+            result, frames, currFrame = findCEX(sk, currFrame, frames, cex, model)
             print("PREV FRAME", prevFrame.index, "CURR", currFrame.index)
             if result:
                 #printCEX()
@@ -120,34 +122,43 @@ def createPrimeVersion(express, literals, index, increment):
 
 
 # Tries to find a counterexample
-def findCEX(sk, Fk, frames, model):
+def findCEX(sk, Fk, frames, cex, model):
     currSolver = Solver()
 
     # We reached init
     if Fk.index == 0:
-        if currSolver.check(Implies(sk, Fk.clauses)):
-            return True, frames, Fk
-        else:
-            return False, frames, Fk
+        return true, cex
+        #if currSolver.check(Implies(sk, Fk.clauses)):
+        #    return True, frames, Fk
+        #else:
+        #    return False, frames, Fk
     else:
         # Finds a bad state in the previous frame
         # (Fk-1 ^ T ^ sk')
         #print(currSolver.check(And(frames[Fk.index - 1].clauses, sk, frames[Fk.index - 1].T)))
-        #frames[Fk.index - 1].solver.check(sk)
+        # while (frames[Fk.index - 1].solver.check(sk) == sat):
         while currSolver.check(And(frames[Fk.index - 1].clauses, sk, frames[Fk.index - 1].T)) == sat:
             currSolver = frames[Fk.index - 1].solver
-            currSolver.add(sk)
+            # currSolver.add(sk)
             sk_1 = retrieveSk(frames[Fk.index - 1], currSolver, model.getLiterals())
 
             print("In frame", Fk.index, ", we found that there is a bad state in frame", Fk.index - 1, "(FC): ", sk_1)
-            result, frames, Fk = findCEX(sk_1, frames[Fk.index - 1], frames, model)
+            cex.append(sk_1)
+            result, cex = findCEX(sk_1, frames[Fk.index - 1], frames, cex, model)
             if result:
-                return result, frames, Fk
-            frames[Fk.index - 1].updateSolver()
+                return result, cex
+            else:
+                cex.pop() # remove sk_1 from cex
+            
+            #frames[Fk.index - 1].updateSolver(Not(sk_1))
 
+        #upon termiantion, none of states in frame k-1, sk_1, is added into cex
+        
         # Blocks the clause
         #result, frames, Fk = pushForward(Not(sk), Fk, frames, model)
-        Fk.clauses = And(Fk.clauses, Not(sk))
+        #Fk.clauses = And(Fk.clauses, Not(sk))
+        frames[Fk.index].updateSolver(Not(sk))
+        return false, cex
         #if result:
           #return True, frames, Fk
         #frames = pushBackward(Not(sk), Fk, frames)
