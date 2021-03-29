@@ -4,7 +4,7 @@ from z3 import *
 class frame:
     def __init__(self, model, inputK):
         self.clauses = model.getProperty(inputK)
-        self.k = inputK
+        self.index = inputK
         self.T = model.getTransition(inputK)
         self.P = model.getProperty(inputK)
         self.PPrime = model.getProperty(inputK+1)
@@ -17,3 +17,6 @@ class frame:
         self.solver = Solver()
         self.solver.add(self.clauses)
         self.solver.add(self.T)
+
+    def printFrame(self):
+        print("Frame", self.index, "contains: ", self.clauses)

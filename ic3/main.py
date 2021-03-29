@@ -2,7 +2,6 @@ from frame import *
 from z3 import *
 import importlib
 
-
 # Runs IC3
 def ic3(model):
     # Input: model
@@ -36,33 +35,38 @@ def ic3(model):
     # BACKWARDS SEARCH
     i = 0  # Var for testing
     while True:
-        print("\nCurr frame", currFrame.k, ": ", currFrame.clauses, "\nPrev Frame", prevFrame.k, ": ", prevFrame.clauses)
-        # Checks for a bad state
+        print("\nCurr frame", currFrame.index, ": ", currFrame.clauses, "\nPrev Frame", prevFrame.index, ": ", prevFrame.clauses)
+        # Checks for a bad stat
         # Sat( Fk ^ T ^ -P')
         while currFrame.solver.check(Not(currFrame.PPrime)) == sat:
             badStateSolver = currFrame.solver  # Preps solver for being passed as a parameters
             badStateSolver.add(Not(currFrame.PPrime))
             sk = retrieveSk(currFrame, badStateSolver, model.getLiterals())
-            print("There is a bad state in frame", currFrame.k , "(BS): ", sk)
+            print("There is a bad state in frame", currFrame.index , "(BS): ", sk)
 
             # Tries to find a counterexample
             result, frames, currFrame = findCEX(sk, currFrame, frames, model)
+            print("PREV FRAME", prevFrame.index, "CURR", currFrame.index)
             if result:
+                #printCEX()
                 return True
-
         # If frames match, its the end of ic3
         equivChecker = Solver()
-        tempCurrFrame = createPrimeVersion(currFrame.clauses, model.getLiterals(), currFrame.k, -1)
+        tempCurrFrame = createPrimeVersion(currFrame.clauses, model.getLiterals(), currFrame.index, -1)
         equivChecker.add(Not(prevFrame.clauses == tempCurrFrame))
         if equivChecker.check() == unsat:
             return False
 
         # PREPS FOR NEXT ITERATION
         k += 1
+        print("PREV FRAME", prevFrame.index, "CURR", currFrame.index)
         currFrame.updateSolver()
         frames.append(currFrame)
+        print("PREV FRAME", prevFrame.index, "CURR", currFrame.index)
         prevFrame = currFrame
+        print("PREV FRAME", prevFrame.index, "CURR", currFrame.index)
         currFrame = frame(model, k)
+        print("PREV FRAME", prevFrame.index, "CURR", currFrame.index)
 
         # Controls loop for testing
         i += 1
@@ -82,7 +86,7 @@ def retrieveSk(Fk, skSolver, literals):
 
     sk = Bool(1)
     for i in range(0, len(literals)):
-        tempBool = Bool((str(literals[i]) + "{0}").format(Fk.k))
+        tempBool = Bool((str(literals[i]) + "{0}").format(Fk.index))
         if i == 0:
             if model.eval(tempBool):
                 sk = tempBool
@@ -98,18 +102,18 @@ def retrieveSk(Fk, skSolver, literals):
 
     # Checks to make sure sk is valid
     checker1 = Solver()
-    checker1.add(Or(Implies(Not(Fk.P), And(Fk.T, sk))), And(Fk.clauses, Fk.T, createPrimeVersion(sk, literals, Fk.k, 2)))
+    checker1.add(Or(Implies(Not(Fk.P), And(Fk.T, sk))), And(Fk.clauses, Fk.T, createPrimeVersion(sk, literals, Fk.index, 2)))
     if checker1.check() == unsat:
         raise ValueError("Something wrong with sk")
 
     return sk
 
 
-def createPrimeVersion(express, literals, k, increment):
+def createPrimeVersion(express, literals, index, increment):
     for x in literals:
         tempStr = str(x) + "{0}"
         try:
-            express = substitute(express, (Bool(tempStr.format(k)), Bool(tempStr.format(k + increment))))
+            express = substitute(express, (Bool(tempStr.format(index)), Bool(tempStr.format(index + increment))))
         except:
             continue
     return express
@@ -120,32 +124,32 @@ def findCEX(sk, Fk, frames, model):
     currSolver = Solver()
 
     # We reached init
-    if Fk.k == 0:
-        currSolver.add(Implies(sk, model.getInit()))
-        if currSolver.check():
+    if Fk.index == 0:
+        if currSolver.check(Implies(sk, Fk.clauses)):
             return True, frames, Fk
         else:
             return False, frames, Fk
     else:
         # Finds a bad state in the previous frame
-        # (Fk-1 ^ T ^ sk')`
-        frames[Fk.k - 1].updateSolver()
-
-        while frames[Fk.k - 1].solver.check(sk) == sat:
-            currSolver = frames[Fk.k - 1].solver
+        # (Fk-1 ^ T ^ sk')
+        #print(currSolver.check(And(frames[Fk.index - 1].clauses, sk, frames[Fk.index - 1].T)))
+        #frames[Fk.index - 1].solver.check(sk)
+        while currSolver.check(And(frames[Fk.index - 1].clauses, sk, frames[Fk.index - 1].T)) == sat:
+            currSolver = frames[Fk.index - 1].solver
             currSolver.add(sk)
-            sk_1 = retrieveSk(frames[Fk.k - 1], currSolver, model.getLiterals())
+            sk_1 = retrieveSk(frames[Fk.index - 1], currSolver, model.getLiterals())
 
-            print("There is a bad state in frame", Fk.k - 1, "(FC): ", sk_1)
-            result, frames, Fk = findCEX(sk_1, frames[Fk.k - 1], frames, model)
+            print("In frame", Fk.index, ", we found that there is a bad state in frame", Fk.index - 1, "(FC): ", sk_1)
+            result, frames, Fk = findCEX(sk_1, frames[Fk.index - 1], frames, model)
             if result:
                 return result, frames, Fk
-            frames[Fk.k - 1].updateSolver()
+            frames[Fk.index - 1].updateSolver()
 
         # Blocks the clause
-        result, frames, Fk = pushForward(Not(sk), Fk, frames, model)
-        if result:
-            return True, frames, Fk
+        #result, frames, Fk = pushForward(Not(sk), Fk, frames, model)
+        Fk.clauses = And(Fk.clauses, Not(sk))
+        #if result:
+          #return True, frames, Fk
         #frames = pushBackward(Not(sk), Fk, frames)
 
     Fk.updateSolver() # Adjusts to new clauses
@@ -161,20 +165,22 @@ def pushForward(c, Fk, frames, model):
 
     currChecker = Fk.solver
     currChecker.add(c)
-    currChecker.add(createPrimeVersion(Not(c), model.getLiterals(), Fk.k, 1))
+    currChecker.add(createPrimeVersion(Not(c), model.getLiterals(), Fk.index, 1))
     if currChecker.check() == sat:  # Has a proof obligation
         sj = retrieveSk(Fk, currChecker, model.getLiterals())
+        print("I have enter proof obligation")
         result, frames, Fk = findCEX(sj, Fk, frames, model)
+
         if result:
             return True, frames, Fk
     else:
         Fk.clauses = simplify(And(Fk.clauses, c))
         #print(Fk.k, "Len:", len(frames), Fk.clauses)
-        if Fk.k + 1 >= len(frames):
+        if Fk.index + 1 >= len(frames):
             return False, frames, Fk
         else:
             #print("In else statement", Fk.k, len(frames))
-            return pushForward(c, frames[Fk.k + 1], frames, model)
+            return pushForward(c, frames[Fk.index + 1], frames, model)
 
 
 # TO be done
@@ -195,6 +201,9 @@ def printResult(result):
             print("P is verified")
     else:
         print("Inconclusive")
+
+#def printCEX(stateList):
+#    pass
 
 
 # Starts IC3
