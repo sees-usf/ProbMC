@@ -22,8 +22,9 @@ class frame:
     def printFrame(self):
         print("Frame", self.index, "contains: ", self.clauses)
         
+        
     # find and return a state 'curState' of this frame such that 'curState ^ T -> targetState' holds
-    def findPredState(targetState, literals):
+    def findPredState(self, targetState, literals):
         # targetState is in prime format
         if self.sovler.check(targetState) == unsat:
             return Bool(0)
@@ -45,3 +46,7 @@ class frame:
         #    raise ValueError("Something wrong with sk")
 
         return curState
+    
+    # return a state 's' if 's ^ T ^ Not(PPrim)' holds; otherwise return Bool(0)  
+    def checkProperty(self):
+        return self.findPredState(Not(self.PPrime))
