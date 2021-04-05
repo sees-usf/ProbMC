@@ -1,4 +1,6 @@
 from ic3 import *
+import sys
+sys.path.append('./models')
 
 # Starts IC3/ Runs models
 print("**MODEL 1**")
