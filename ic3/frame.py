@@ -4,13 +4,20 @@ from z3 import *
 class frame:
     def __init__(self, model, frameIndex):
         self.literals = model.getLiterals()
-        self.clauses = model.getProperty(frameIndex)
+        
+        initBlockingCl = model.getProperty(frameIndex)
+        
+        # the two lists below are mutual exclusive
+        self.blockingCList = [] # blocking clauses
+        self.inductiveClist = [] # blocking and inductive clasues
+        
+        self.blockingClist.append(initBlockingCl)
         self.index = frameIndex
         self.T = model.getTransition(self.index)
         self.P = model.getProperty(self.index)
         self.PPrime = model.getProperty(self.index + 1)
         self.solver = Solver()  # Each solver contains the clauses and the transition
-        self.solver.add(self.clauses)
+        self.solver.add(initBlockingCl)
         self.solver.add(self.T)
 
     # Updates the solver to work with new clauses
