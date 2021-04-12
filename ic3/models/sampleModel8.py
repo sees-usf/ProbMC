@@ -55,6 +55,15 @@ def getTransition(k):
            And(st6, st7_prime),
            And(st7, st0_prime))
 
+    T = And(Implies(st0, st1_prime),
+            Implies(st1, st2_prime),
+            Implies(st2, st3_prime),
+            Implies(st3, st4_prime),
+            Implies(st4, st5_prime),
+            Implies(st5, st0_prime),
+            Implies(st6, st7_prime),
+            Implies(st7, st0_prime))
+
     return T
 
 

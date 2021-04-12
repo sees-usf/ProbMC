@@ -19,7 +19,10 @@ print("\n**MODEL 5**")
 ic3(importlib.import_module("sampleModel5"))
 
 print("\n**MODEL 6**")
-ic3(importlib.import_module("sampleModel6"))
+#ic3(importlib.import_module("sampleModel6"))
 
 print("\n**MODEL 7**")
-ic3(importlib.import_module("sampleModel7"))
+#ic3(importlib.import_module("sampleModel7"))
+
+print("\n**MODEL 8**")
+ic3(importlib.import_module("sampleModel8"))

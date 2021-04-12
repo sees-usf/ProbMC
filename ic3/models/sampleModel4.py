@@ -39,20 +39,20 @@ def getTransition(k):
     st4_prime = And(aPrime, Not(bPrime), Not(cPrime))
     st5_prime = And(aPrime, Not(bPrime), cPrime)
 
-    #T = And(Implies(st0, Or(st1_prime, st5_prime)),
-    #        Implies(st1, Or(st0_prime, st2_prime, st4_prime)),
-    #        Implies(st2, st3_prime),
-    #        Implies(st3, st4_prime),
-    #        Implies(st4, st0_prime),
-    #        Implies(st5, Or(st0_prime, st4_prime)),
-    #        )
+    # T = And(Implies(st0, Or(st1_prime, st5_prime)),
+    #         Implies(st1, Or(st0_prime, st2_prime, st4_prime)),
+    #         Implies(st2, st3_prime),
+    #         Implies(st3, st4_prime),
+    #         Implies(st4, st0_prime),
+    #         Implies(st5, Or(st0_prime, st4_prime)),
+    #         )
 
     T = Or(And(st0, st1_prime), And(st0, st5_prime),
            And(st1, st0_prime), And(st1, st2_prime), And(st1, st4_prime),
            And(st2, st3_prime),
            And(st3, st4_prime),
            And(st4, st0_prime),
-           And(st5, st0_prime), And(st5, st4_prime))
+          And(st5, st0_prime), And(st5, st4_prime))
 
     return T
 

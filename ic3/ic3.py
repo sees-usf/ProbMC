@@ -52,7 +52,7 @@ def ic3(model):
             cex.append(sk)
             result, frames, currFrame = findCEX(sk, currFrame, frames, cex)
             if result:
-                printCEX(cex)
+                printCEX(cex, currFrame)
                 return True
             else:
                 cex.pop()
@@ -100,6 +100,7 @@ def findCEX(sk, Fk, frames, cex):
         # Blocks the clause
         Fk.clauses = And(Fk.clauses, Not(sk))
         Fk.updateSolver(Not(sk))
+        #frames = pushBackward(Not(sk), frames)
         return False, frames, Fk  # add cex here
 
 
@@ -118,16 +119,19 @@ def pushForward(c, Fk, frames, model):
     pass
 
 
-def pushBackward(c, Fk, frames):
-    pass
+def pushBackward(c, frames):
+    for f in frames:
+        f.clauses = And(f.clauses, c)
+        f.updateSolver(c)
+    return frames
 
 
 def generalization(c, k):
     pass
 
 
-def printCEX(stateList):
-    print("\nCOUNTEREXAMPLE")
+def printCEX(stateList, frame):
+    print("\nCOUNTEREXAMPLE\n", simplify(Not(frame.P)))
     for x in stateList:
         print(x)
 

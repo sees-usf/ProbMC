@@ -37,6 +37,10 @@ def getTransition(k):
             Implies(st3, st0_prime)
             )
 
+    # T = Or(And(st0, st1_prime), And(st0, st3_prime),
+    #        And(st1, st0_prime), And(st1, st2_prime),
+    #        And(st3, st0_prime))
+
     return T
 
 
