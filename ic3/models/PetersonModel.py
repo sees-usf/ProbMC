@@ -34,17 +34,17 @@ def getTransition(k):
     # Defining states - prime
 
     T1 = And(Implies(st1 == 0, st1_next == 1),
-             Implies(st1 == 1, And(b1 == True, x == 2, st1_next == 2)),
+             Implies(st1 == 1, And(b1Prime == True, xPrime == 2, st1_next == 2)),
              Implies(And(st1 == 2, Or(x == 1, b2 == False)), st1_next == 3),
              Implies(And(st1 == 2, Not(Or(x == 1, b2 == False))), st1_next == 2),
-             Implies(st1 == 3, And(b1 == False, st1_next == 0))
+             Implies(st1 == 3, And(b1Prime == False, st1_next == 0))
              )
 
     T2 = And(Implies(st2 == 0, st2_next == 1),
-             Implies(st2 == 1, And(b2 == True, x == 2, st2_next == 2)),
+             Implies(st2 == 1, And(b2Prime == True, xPrime == 2, st2_next == 2)),
              Implies(And(st2 == 2, Or(x == 1, b1 == False)), st2_next == 3),
              Implies(And(st2 == 2, Not(Or(x == 1, b1 == False))), st2_next == 2),
-             Implies(st2 == 3, And(b2 == False, st2_next == 0))
+             Implies(st2 == 3, And(b2Prime == False, st2_next == 0))
              )
 
     T = Or(And(T1, st2 == st2_next),
