@@ -58,16 +58,22 @@ def ic3(model):
                 cex.pop()
 
         # If frames match, its the end of ic3
-        tempCurrFrame = createPrimeVersion(currFrame.clauses, model.getLiterals(), currFrame.index, -1)
+        tempCurrFrame = createPrimeVersion(currFrame.clauses, model.getVariables(), currFrame.index, -1)
         if equivChecker.check(Not(prevFrame.clauses == tempCurrFrame)) == unsat:
             print("P is verified")
             return False
 
         # PREPS FOR NEXT ITERATION
+        frames, result = pushForward(frames, cex)
+        if result:
+            printCEX(cex, currFrame)
+            return True
         k += 1
         frames.append(currFrame)
         prevFrame = currFrame
         currFrame = frame(model, k)
+        currFrame.inductiveCList = prevFrame.inductiveCList
+
 
         # Control loop for testing
         #i += 1
@@ -91,14 +97,15 @@ def findCEX(sk, Fk, frames, cex):
             cex.append(sk_1)
             result,frames, tempFk = findCEX(sk_1, frames[Fk.index - 1], frames, cex)
             if result:
-                return result, frames, Fk  # add cex here
+                return result, frames, Fk # add cex here
             else:
                 cex.pop()  # remove sk_1 from cex
 
         # upon termination, none of states in frame k-1, sk_1, is added into cex
-
         # Blocks the clause
         Fk.clauses = And(Fk.clauses, Not(sk))
+        Fk.blockingCList.append(Not(sk))
+        Fk.inductiveCList.append(Not(sk))
         Fk.updateSolver(Not(sk))
         #frames = pushBackward(Not(sk), frames)
         return False, frames, Fk  # add cex here
@@ -114,16 +121,20 @@ def createPrimeVersion(express, literals, index, increment):
     return express
 
 
-# TO be done
-def pushForward(c, Fk, frames, model):
-    pass
+def pushForward(frames, cex):
+    print("PUSH FORWARD ACTIVATED")
+    for i in range(0, len(frames) - 1):
+        for c in frames[i].blockingCList:
+            if frames[i].solver.check(And(c, Not(createPrimeVersion(c, frames[i].variables, i, 1)))) == sat:
+                result, frames, frames[i] = findCEX(frames[i].findPredState(And(c, Not(createPrimeVersion(c, frames[i].variables, i, 1)))), frames[i], frames, cex)
+                if result:
+                    return frames, True
+            else:
+                frames[i + 1].clauses = And(frames[i + 1].clauses, c)
+                frames[i+1].inductiveCList.append(c)
 
+    return frames, False
 
-def pushBackward(c, frames):
-    for f in frames:
-        f.clauses = And(f.clauses, c)
-        f.updateSolver(c)
-    return frames
 
 
 def generalization(c, k):
