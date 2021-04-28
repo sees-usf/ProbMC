@@ -11,7 +11,7 @@ def getProperty(k):
     return P
 
 
-def getLiterals():
+def getVariables():
     return ["a", "b", "c", "d"]
 
 
@@ -46,14 +46,14 @@ def getTransition(k):
     st6_prime = And(Not(aPrime), bPrime, cPrime, Not(dPrime))
     st7_prime = And(Not(aPrime), bPrime, cPrime, dPrime)
 
-    T = Or(And(st0, st1_prime),
-           And(st1, st2_prime),
-           And(st2, st3_prime),
-           And(st3, st4_prime),
-           And(st4, st5_prime),
-           And(st5, st0_prime),
-           And(st6, st7_prime),
-           And(st7, st0_prime))
+    # T = Or(And(st0, st1_prime),
+    #        And(st1, st2_prime),
+    #        And(st2, st3_prime),
+    #        And(st3, st4_prime),
+    #        And(st4, st5_prime),
+    #        And(st5, st0_prime),
+    #        And(st6, st7_prime),
+    #        And(st7, st0_prime))
 
     T = And(Implies(st0, st1_prime),
             Implies(st1, st2_prime),

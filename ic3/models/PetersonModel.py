@@ -1,18 +1,15 @@
 from z3 import *
 
-
 def getProperty(k):
     # Defining variables
-    x = Int("x{0}".format(k))
     st1 = Int("st1{0}".format(k))
     st2 = Int("st2{0}".format(k))
-    b1 = Bool("b1{0}".format(k))
-    b2 = Bool("b2{0}".format(k))
+
     P = Not(And(st1 == 3, st2 == 3))
     return P
 
 
-def getLiterals():
+def getVariables():
     return ["x", "st1", "st2", "b1", "b2"]
 
 
@@ -55,10 +52,10 @@ def getTransition(k):
 
 def getInit():
     # Defining variables
-    st1 = Int("st1{0}".format(0))
-    st2 = Int("st2{0}".format(0))
-    b1 = Bool("b1{0}".format(0))
-    b2 = Bool("b2{0}".format(0))
+    st1 = Int("st10")
+    st2 = Int("st20")
+    b1 = Bool("b10")
+    b2 = Bool("b20")
 
     init = And(st1 == 1, b1 == False, st2 == 0, b2 == False)
     return init

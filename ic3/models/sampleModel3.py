@@ -9,7 +9,7 @@ def getProperty(k):
     return P
 
 
-def getLiterals():
+def getVariables():
     return ["a", "b"]
 
 
