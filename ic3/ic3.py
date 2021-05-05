@@ -39,8 +39,13 @@ def ic3(model):
     i = 0  # Var for testing
     cex = []
     while True:
-        print("\nIteration", prevFrame.index, "\nCurr frame", currFrame.index, ": ", currFrame.clauses, "\nPrev Frame", prevFrame.index, ": ",
-              prevFrame.clauses)
+        print("\nITERATION", prevFrame.index)
+        print("-Prev Frame-")
+        prevFrame.printClauseInfo()
+        print("\n-Curr Frame-")
+        currFrame.printClauseInfo()
+        print("\n")
+
 
         # Checks for a bad state
         # Sat( Fk ^ T ^ -P')
@@ -64,15 +69,22 @@ def ic3(model):
             return False
 
         # PREPS FOR NEXT ITERATION
-        frames, result = pushForward(frames, cex)
+        #frames, result = pushForward(frames, cex)
         if result:
             printCEX(cex, currFrame)
             return True
+        print("AT END OF ITERATION")
+        currFrame.printClauseInfo()
+        #print("curr frame:", currFrame.index)
+        #print("Inductive", currFrame.inductiveCList)
+        #print("Blocking", currFrame.blockingCList)
         k += 1
         frames.append(currFrame)
         prevFrame = currFrame
         currFrame = frame(model, k)
-        currFrame.inductiveCList = prevFrame.inductiveCList
+        frames.append(currFrame)
+        currFrame.blockingCList = prevFrame.inductiveCList
+
 
 
         # Control loop for testing
@@ -105,10 +117,8 @@ def findCEX(sk, Fk, frames, cex):
         # Blocks the clause
         Fk.clauses = And(Fk.clauses, Not(sk))
         Fk.blockingCList.append(Not(sk))
-        Fk.inductiveCList.append(Not(sk))
         Fk.updateSolver(Not(sk))
-        #frames = pushBackward(Not(sk), frames)
-        return False, frames, Fk  # add cex here
+        return False, frames, Fk
 
 
 def createPrimeVersion(express, literals, index, increment):
@@ -123,15 +133,18 @@ def createPrimeVersion(express, literals, index, increment):
 
 def pushForward(frames, cex):
     print("PUSH FORWARD ACTIVATED")
-    for i in range(0, len(frames) - 1):
-        for c in frames[i].blockingCList:
-            if frames[i].solver.check(And(c, Not(createPrimeVersion(c, frames[i].variables, i, 1)))) == sat:
-                result, frames, frames[i] = findCEX(frames[i].findPredState(And(c, Not(createPrimeVersion(c, frames[i].variables, i, 1)))), frames[i], frames, cex)
-                if result:
-                    return frames, True
-            else:
-                frames[i + 1].clauses = And(frames[i + 1].clauses, c)
-                frames[i+1].inductiveCList.append(c)
+    # for i in range(1, len(frames) - 1):
+    #     for j in range(0, len(frames[i].blockingCList)):
+    #         c = frames[i].blockingCList[j]
+    #         if frames[i].solver.check(And(c, Not(createPrimeVersion(frames[i].blockingCList[j], frames[i].variables, i, 1)))) == sat:
+    #             result, frames, frames[i] = findCEX(frames[i].findPredState(And(frames[i].blockingCList[j], Not(createPrimeVersion(frames[i].blockingCList[j], frames[i].variables, i, 1)))), frames[i], frames, cex)
+    #             if result:
+    #                 print("CEX found via PF")
+    #                 return frames, True
+    #         else:
+    #             frames[i + 1].clauses = And(frames[i + 1].clauses, frames[i].blockingCList[j])
+    #             frames[i+1].inductiveCList.append(frames[i].blockingCList[j])
+    #             #frames[i].blockingCList.pop(j)
 
     return frames, False
 

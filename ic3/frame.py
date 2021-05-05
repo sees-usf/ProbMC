@@ -13,7 +13,7 @@ class frame:
         # Mutually exclusive blocking clauses list
         self.clauses = self.P
         self.blockingCList = [self.P]  # blocking clauses
-        self.inductiveCList = []  # blocking and inductive classes
+        self.inductiveCList = []  # blocking, inductive classes
 
         # Solver Init
         self.solver = Solver()  # Each solver contains the clauses and the transition
@@ -51,6 +51,29 @@ class frame:
         curState = simplify(curState)
 
         return curState
+
+    # Creates and object of all clauses
+    def callClauses(self):
+        clause = True
+        for x in self.blockingCList:
+            clause = And(clause, x)
+        for x in self.inductiveCList:
+            clause = And(clause, x)
+        return clause
+
+    # Prints the current clauses neatly
+    def printClauseInfo(self):
+        print("Frame", self.index, "contains...")
+        print("Blocking Clauses\n-----------------")
+        for x in self.blockingCList:
+            print(x)
+
+        print("\nInductive Clauses\n-----------------")
+        if not self.inductiveCList:
+            return
+        for x in self.inductiveCList:
+            print(x)
+
 
     # return a state 's' if 's ^ T ^ Not(PPrim)' holds; otherwise return Bool(0)
     def checkProperty(self):
