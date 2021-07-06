@@ -17,13 +17,13 @@ from z3 import *
 
 def GetStep(step):
     """ Transition Relations """
-    current_x1 = Bool("x1.{0}".format(step))
-    next_x1 = Bool("x1.{0}".format(step+1))
-    current_x2 = Bool("x2.{0}".format(step))
-    next_x2 = Bool("x2.{0}".format(step+1))
-    current_x3 = Bool("x3.{0}".format(step))
-    next_x3 = Bool("x3.{0}".format(step+1))
-    probability = Real("p{0}".format(step+1))
+    current_x1 = Bool("x1.{0}".format(step-1))
+    next_x1 = Bool("x1.{0}".format(step))
+    current_x2 = Bool("x2.{0}".format(step-1))
+    next_x2 = Bool("x2.{0}".format(step))
+    current_x3 = Bool("x3.{0}".format(step-1))
+    next_x3 = Bool("x3.{0}".format(step))
+    probability = Real("p.{0}".format(step))
 
     ranges = And(0 <= probability, probability <= 1)
     choice1 = And(current_x1==current_x3, (Or(And(probability==0.5, next_x1==False), And(probability==0.5, next_x1==True))))
@@ -39,12 +39,12 @@ def GetStep(step):
 
 def GetProperty(step):
     """ Property """
-    current_x1 = Bool("x1.{0}".format(step))
-    next_x1 = Bool("x1.{0}".format(step+1))
-    current_x2 = Bool("x2.{0}".format(step))
-    next_x2 = Bool("x2.{0}".format(step+1))
-    current_x3 = Bool("x3.{0}".format(step))
-    next_x3 = Bool("x3.{0}".format(step+1))
+    current_x1 = Bool("x1.{0}".format(step-1))
+    next_x1 = Bool("x1.{0}".format(step))
+    current_x2 = Bool("x2.{0}".format(step-1))
+    next_x2 = Bool("x2.{0}".format(step))
+    current_x3 = Bool("x3.{0}".format(step-1))
+    next_x3 = Bool("x3.{0}".format(step))
 
     property = (And(next_x1==False, next_x2==True, next_x3==False))  # As of right now, we have to negate the property ourselves
     # Note: Probability returned 1st on step 2 given property next_x1==True, next_x2==False, and next_x3==True and init of (1 1 0)
@@ -54,12 +54,12 @@ def GetProperty(step):
 
 def GetInitialStates():
     """ Initial States """
-    current_x1 = Bool("x1.0")
-    next_x1 = Bool("x1.1")
-    current_x2 = Bool("x2.0")
-    next_x2 = Bool("x2.1")
-    current_x3 = Bool("x3.0")
-    next_x3 = Bool("x3.1")
+    current_x1 = Bool("x1.0".format(0))
+    next_x1 = Bool("x1.1".format(0))
+    current_x2 = Bool("x2.0".format(0))
+    next_x2 = Bool("x2.1".format(0))
+    current_x3 = Bool("x3.0".format(0))
+    next_x3 = Bool("x3.1".format(0))
 
     # initial_states = And(current_x1==True, current_x2==True, current_x3==True) # This is what hermans should be initialized to
     # We don't use this for testing because if all the x's are True, the new x's can be any value rather than 1 strict value,

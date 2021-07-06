@@ -32,20 +32,20 @@ from z3 import *
 
 def GetStep(step):
     """ Transition Relations """
-    current_b1 = Bool("b1.{0}".format(step))
-    current_b2 = Bool("b2.{0}".format(step))
-    current_pc1 = Int("pc1.{0}".format(step))
-    current_pc2 = Int("pc2.{0}".format(step))
-    current_x = Int("x.{0}".format(step))
-    next_b1 = Bool("b1.{0}".format(step+1))
-    next_b2 = Bool("b2.{0}".format(step+1))
-    next_pc1 = Int("pc1.{0}".format(step+1))
-    next_pc2 = Int("pc2.{0}".format(step+1))
-    next_x = Int("x.{0}".format(step+1))
+    current_b1 = Bool("b1.{0}".format(step-1))
+    current_b2 = Bool("b2.{0}".format(step-1))
+    current_pc1 = Int("pc1.{0}".format(step-1))
+    current_pc2 = Int("pc2.{0}".format(step-1))
+    current_x = Int("x.{0}".format(step-1))
+    next_b1 = Bool("b1.{0}".format(step))
+    next_b2 = Bool("b2.{0}".format(step))
+    next_pc1 = Int("pc1.{0}".format(step))
+    next_pc2 = Int("pc2.{0}".format(step))
+    next_x = Int("x.{0}".format(step))
     n = Int("n")
     w = Int("w")
     c = Int("c")
-    probability = Real('p{0}'.format(step+1))
+    probability = Real('p.{0}'.format(step+1))
 
     ranges = And(And(1 <= current_x, current_x <= 2), And(1 <= next_x, next_x <= 2), And(0 <= probability, probability <= 1), n==0, w==1, c==2)
     keep_1 = And(current_pc1==next_pc1, current_b1==next_b1)
@@ -63,8 +63,8 @@ def GetStep(step):
 
 def GetProperty(step):
     """ Property """
-    next_pc1 = Int("pc1.{0}".format(step+1))
-    next_pc2 = Int("pc2.{0}".format(step+1))
+    next_pc1 = Int("pc1.{0}".format(step))
+    next_pc2 = Int("pc2.{0}".format(step))
     c = Int("c")
 
     property = And(next_pc1==c, next_pc2==c) # Shouldn't happen
