@@ -21,8 +21,8 @@ class BMC:
         total_probability = 0
         for i in range(1, (self.path_length+1)):
             self.path_length = i
-            self.PathEncoding()
-            prob_from_step = self.Check()
+            self.PathEncoding(i)
+            prob_from_step = self.Check(i)
             print(i, prob_from_step)
             total_probability += prob_from_step
             if total_probability >= property_prob:
@@ -34,11 +34,11 @@ class BMC:
         print("Total probability: {}".format(total_probability))
 
 
-    def PathEncoding(self):
+    def PathEncoding(self, i):
         """
         Adds an encoding of the path with a length of path_length, which is incremented in __init__
         """
-        path = self.model.GetStep(self.path_length-1)
+        path = self.model.GetStep(i)
         self.solver.add(path)
 
     def ExcludePath(self, cx_model):
@@ -50,21 +50,22 @@ class BMC:
         cx_value_list = []
         for declaration in cx_model.decls():
             # print ("%s = %s" % (declaration.name(), cx_model[declaration]))
+            name = str(declaration.name())
+            if name.find('/0') != -1: #Avoiding '/0' in counter example (Appears when using '/' in model).
+                break;
             if is_int_value(cx_model[declaration]):
                 cx_value_list.append(Int(declaration.name())==cx_model[declaration].as_long())
             elif is_true(cx_model[declaration]) or is_false(cx_model[declaration]):
                 cx_value_list.append(Bool(declaration.name())==cx_model[declaration])
             else:  # For Real Values
-                numerator = float(cx_model[declaration].numerator_as_long())
-                denominator = float(cx_model[declaration].denominator_as_long())
-                p_value = numerator/denominator
-                cx_value_list.append(Real(declaration.name())==p_value)
+                if(name.find('p.') == -1): #Avoid adding the probability to counter example
+                    cx_value_list.append(Real(declaration.name())==cx_model[declaration])
         
         cx = Not(And(cx_value_list))  # Counterexample to begin avoiding
         self.reached_cx_list.append(cx)  # Add to list of all the counterexamples to avoid
         return self.reached_cx_list
 
-    def Check(self):
+    def Check(self, i):
         """
         Finds all counterexample models given a path at its most recent step and returns the probability of the path occuring
         """
@@ -73,8 +74,9 @@ class BMC:
         if self.reached_cx_list:
             self.solver.add(self.reached_cx_list)
         self.solver.push() # Saves initial states, path, and past counterexamples. These won't be removed on solver.pop()
-        property = self.model.GetProperty(self.path_length-1) # Return property regarding the most recent step
+        property = self.model.GetProperty(i) # Return property regarding the most recent step
         self.solver.add(property)
+        # print(self.solver.check()) //Print "sat/unsat"
 
         # Check the Bounded Model
         total_probability = 0
@@ -87,7 +89,7 @@ class BMC:
             probability = 1
             for k in range(self.path_length+1):
                 for d in cx_model.decls():
-                    if d.name() == "p{0}".format(k):
+                    if d.name() == "p.{0}".format(k):
                         numerator = float(cx_model[d].numerator_as_long())
                         denominator = float(cx_model[d].denominator_as_long())
                         probability *= numerator/denominator
