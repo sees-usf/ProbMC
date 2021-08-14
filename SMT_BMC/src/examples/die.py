@@ -13,12 +13,23 @@
 
 from z3 import *
 
+# State variable strings.
+s = 's.{0}'
+dicevalue = 'dv.{0}'
+
+# Transition probability strings.
+trprb = 'p.{0}'
+
+# List of variable and probability strings.
+probabilties = []
+state_variable_list = []
+
 def GetStep(step):
     """ Transition Relations """
-    current_state = Int('s{0}'.format(step - 1))
-    probability = Real('p.{0}'.format(step))
-    dice_value = Int("dv{0}".format(step))
-    next_state = Int("s{0}".format(step))
+    current_state = Int(s.format(step - 1))
+    probability = Real(trprb.format(step))
+    dice_value = Int(dicevalue.format(step))
+    next_state = Int(s.format(step))
 
     ranges = And(And(0 <= current_state, current_state <= 7), And(0 <= next_state, next_state <= 7), And(0 <= dice_value, dice_value <= 6), And(0 <= probability, probability <= 1))
     choice1 = And(current_state==0, (Or(And(probability==0.5, dice_value==0, next_state==1), And(probability==0.5, dice_value==0, next_state==2))))
@@ -32,12 +43,16 @@ def GetStep(step):
 
     step = And(ranges, Or(choice1, choice2, choice3, choice4, choice5, choice6, choice7, choice8)) # OR()ing choices together = Asynchrounous
 
+    probabilties.append(probability) # Keeping track of previous states (necessary).
+    state_variable_list.append(next_state)
+    state_variable_list.append(dice_value)
+
     return step
 
 def GetProperty(step):
     """ Property """
-    dice_value = Int("dv{0}".format(step))
-    next_state = Int("s{0}".format(step))
+    dice_value = Int(dicevalue.format(step))
+    next_state = Int(s.format(step))
 
     property = (And(next_state==7, dice_value==1))  # As of right now, we have to negate the property ourselves
 
@@ -45,9 +60,18 @@ def GetProperty(step):
 
 def GetInitialStates():
     """ Initial States """
-    dice_value = Int("dv1")
-    current_state = Int("s0")
+    dice_value = Int(dicevalue.format(0))
+    current_state = Int(s.format(0))
 
     initial_states = And(current_state==0, dice_value==0)
+    
+    state_variable_list.append(current_state) # Keeping track of previous states (necessary).
+    state_variable_list.append(dice_value)
 
     return initial_states
+    
+def GetStateVaribleStrings(): # Return all the states not including probabilties.
+    return state_variable_list
+
+def GetTransitionProbStrings(): # Return all the states including probabilties
+    return probabilties

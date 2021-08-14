@@ -30,22 +30,36 @@
 
 from z3 import *
 
+# State variable strings.
+b1 = 'b1.{0}'
+b2 = 'b2.{0}'
+pc1 = 'pc1.{0}'
+pc2 = 'pc2.{0}'
+x = 'x.{0}'
+
+# Transition probability strings.
+trprb = 'p.{0}'
+
+# List of variable and probability strings.
+probabilties = []
+state_variable_list = []
+
 def GetStep(step):
     """ Transition Relations """
-    current_b1 = Bool("b1.{0}".format(step-1))
-    current_b2 = Bool("b2.{0}".format(step-1))
-    current_pc1 = Int("pc1.{0}".format(step-1))
-    current_pc2 = Int("pc2.{0}".format(step-1))
-    current_x = Int("x.{0}".format(step-1))
-    next_b1 = Bool("b1.{0}".format(step))
-    next_b2 = Bool("b2.{0}".format(step))
-    next_pc1 = Int("pc1.{0}".format(step))
-    next_pc2 = Int("pc2.{0}".format(step))
-    next_x = Int("x.{0}".format(step))
+    current_b1 = Bool(b1.format(step-1))
+    current_b2 = Bool(b2.format(step-1))
+    current_pc1 = Int(pc1.format(step-1))
+    current_pc2 = Int(pc2.format(step-1))
+    current_x = Int(x.format(step-1))
+    next_b1 = Bool(b1.format(step))
+    next_b2 = Bool(b2.format(step))
+    next_pc1 = Int(pc1.format(step))
+    next_pc2 = Int(pc2.format(step))
+    next_x = Int(x.format(step))
     n = Int("n")
     w = Int("w")
     c = Int("c")
-    probability = Real('p.{0}'.format(step))
+    probability = Real(trprb.format(step))
 
     ranges = And(And(1 <= current_x, current_x <= 2), And(1 <= next_x, next_x <= 2), And(0 <= probability, probability <= 1), n==0, w==1, c==2)
     keep_1 = And(current_pc1==next_pc1, current_b1==next_b1)
@@ -59,12 +73,19 @@ def GetStep(step):
 
     step = And(ranges, Or(And(Or(choice1, choice2, choice3), keep_2), And(Or(choice4, choice5, choice6), keep_1)))
 
+    probabilties.append(probability) # Keeping track of previous states (necessary).
+    state_variable_list.append(next_b1)
+    state_variable_list.append(next_b2)
+    state_variable_list.append(next_pc1)
+    state_variable_list.append(next_pc2)
+    state_variable_list.append(next_x)
+    
     return step
 
 def GetProperty(step):
     """ Property """
-    next_pc1 = Int("pc1.{0}".format(step))
-    next_pc2 = Int("pc2.{0}".format(step))
+    next_pc1 = Int(pc1.format(step))
+    next_pc2 = Int(pc2.format(step))
     c = Int("c")
 
     property = And(next_pc1==c, next_pc2==c) # Shouldn't happen
@@ -74,12 +95,17 @@ def GetProperty(step):
 
 def GetInitialStates():
     """ Initial States """
-    current_b1 = Bool("b1.0")
-    current_b2 = Bool("b2.0")
-    current_pc1 = Int("pc1.0")
-    current_pc2 = Int("pc2.0")
+    current_b1 = Bool(b1.format(0))
+    current_b2 = Bool(b2.format(0))
+    current_pc1 = Int(pc1.format(0))
+    current_pc2 = Int(pc2.format(0))
     n = Int("n")
 
     initial_states = And(current_pc1==n, current_pc2==n, current_b1==False, current_b2==False)
+
+    state_variable_list.append(current_b1)
+    state_variable_list.append(current_b2)
+    state_variable_list.append(current_pc1)
+    state_variable_list.append(current_pc2)
 
     return initial_states
