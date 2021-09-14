@@ -6,6 +6,7 @@ Stochastic verificaiton technique, *probabilistic model checking* in particular,
 
 The papers below summarizes our recent work from this project.
 
-* *STAMINA: STochastic ApproximateModel-checker for INfinite-state Analysis*, Thakur Neupane, Chris J. Myers,Curtis Madsen, Hao Zheng, Zhen Zhang, CAV'19, July, 2019, to appear.
+* *A Comparison of Weighted Stochastic Simulation Methods*, Payton Thomas, Mohammad Ahmadi, Hao Zheng and Chris Myers, IWBDA, September, 2021.
+* *STAMINA: STochastic ApproximateModel-checker for INfinite-state Analysis*, Thakur Neupane, Chris J. Myers,Curtis Madsen, Hao Zheng, Zhen Zhang, CAV'19, July, 2019.
 
 * *Approximation Techniques for Stochastic Analysis of Biological Systems*, Thakur Neupane, Zhen Zhang, Curtis Madsen, Hao Zheng, Chris J. Myers, a book chapter in Automated Reasoning for Systems Biology and Medicine. Springer International Publishing, 2019
