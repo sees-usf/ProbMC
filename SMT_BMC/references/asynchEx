@@ -1,0 +1,52 @@
+B1, b2: boolean
+x: integer[1..2]
+
+Initial: pc1=n1, pc2=n2, b1=b2=false, x either 1 or 2
+
+Pc1 = n1 -> b1:=true; x:=2; pc1 := w1
+Pc1 = w1 && (x=1 || !b2) -> pc1 := c1
+pc1 = c1 -> b1 := false; pc1 := n1 
+Pc2 = n2 -> b2:=true; x:=1; pc2 := w2
+Pc2 = w2 && (x=2 || !b1) -> pc2 := c2
+Pc2 = c2 -> b2 := false; pc2 := n2
+
+Property: p1=c1 && pc2 = c2 (this is not supposed to happen)
+
+# Notes used to create the asynch.py file are shown below.
+
+"""
+B1, b2: boolean
+x: integer[1..2]
+
+Initial: pc1=n1, pc2=n2, b1=b2=false, x either 1 or 2
+
+# Only execute 1 transition
+
+tr1 ... add additional constraints (Ex. pc2 should be the same in current and next state (pc2 = pc2'))
+    (b2 = b2'... etc.)
+tr2 .. etc., then OR them together
+
+Pc1 = n1 -> b1:=true; x:=2; pc1 := w1
+Pc1 = w1 && (x=1 || !b2) -> pc1 := c1 // I switched this b2 with b1 in the transition relations
+pc1 = c1 -> b1 := false; pc1 := n1 
+Pc2 = n2 -> b2:=true; x:=1; pc2 := w2
+Pc2 = w2 && (x=2 || !b1) -> pc2 := c2 // I switched this b1 with b2 in the transition relations
+Pc2 = c2 -> b2 := false; pc2 := n2
+
+b1, b2 = Boolean -> Change
+x = Int
+pc1, pc2 = Int() -> Change
+w = 1
+c = 2
+n = 0
+
+Property: p1=c1 && pc2 = c2 (this is not supposed to happen)
+
+Running through a path...
+    # 1st... Hits choice 1... Now... pc1.1=w, x.1=2, b1.1=True
+    # 2nd... Hits choice 2... x.1!=1 and !b1 are both False, making the OR statement false, causing the transition to fail.
+    #        Hits choice 4... Now... pc2.2=w, x.2=1, b2.2=True
+    # 3rd... Hits choice 2... x.2==1, making the OR statement true... Now... pc1.3=c, b1.3=True, x.3=1
+    # 4th... Hits choice 5... 
+
+"""

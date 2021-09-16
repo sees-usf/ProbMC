@@ -1,0 +1,6 @@
+    dice = Int("dice_value")
+    next= Int("next_s")
+
+    property = (And(next==7, dice==1))  # As of right now, we have to negate the property ourselves
+
+    property_probability = 1

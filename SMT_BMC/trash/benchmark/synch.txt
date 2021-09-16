@@ -1,0 +1,8 @@
+    r1 = Bool("r1")
+    r2= Bool("r2")
+    x = Bool("x")
+
+    choice1 = Xor(x, And(Implies(r1, r2), Implies(r2, r1)))
+    choice2 = And(Implies(Or(And(Not(x), r2), And(r1, x)), r2), Implies(Or(And(Not(x), r2), And(r1, x)), r2))
+
+    step = And(Or(choice1, choice2))

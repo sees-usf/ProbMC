@@ -1,0 +1,80 @@
+// gxn/dxp 13/07/02
+
+// the procotol is synchronous with no nondeterminism (a DTMC)
+dtmc
+
+const double p = 0.5;
+
+// module for process 1
+module process1
+
+// Boolean variable for process 1
+x1 : [0..1] init 1;
+
+[step] (x1=x3) -> p : (x1'=0) + 1-p : (x1'=1);
+[step] !(x1=x3) -> (x1'=x3);
+
+endmodule
+
+module process2
+
+// Boolean variable for process 1
+x2 : [0..1] init 1;
+
+[step] (x2=x1) -> p : (x2'=0) + 1-p : (x2'=1);
+[step] !(x2=x1) -> (x2'=x1);
+
+endmodule
+
+module process3
+
+// Boolean variable for process 1
+x3 : [0..1] init 1;
+
+[step] (x3=x2) -> p : (x3'=0) + 1-p : (x3'=1);
+[step] !(x3=x2) -> (x3'=x2);
+
+endmodule
+
+// cost - 1 in each state (expected number of steps)
+rewards "steps"
+true : 1;
+endrewards
+
+
+// formula, for use in properties: number of tokens
+// (i.e. number of processes that have the same value as the process to their left)
+formula num_tokens = (x1=x2?1:0)+(x2=x3?1:0)+(x3=x1?1:0);
+
+// label - stable configurations (1 token)
+label "stable" = num_tokens=1;
+
+
+# Let's step through
+
+# Basically, if the neighbor doesn't match, make it match.
+# If the neighbor does match, choose whatever number you want.
+# When programming this, make sure that the x comparisons are
+# comparing the "current" or old values of x, and not the newly discovered ones.
+# current_x2 != current_x1 ... set new_x2 == current_x1
+# This is because they are synchronous, all happening at the same time.
+# The constraints cannot rely on new values because 
+
+  x's:  1 2 3
+Step 0: 1 1 1
+  x1: x1=x3... Choose between 1 and 0 ->  1
+  x2: x2=x1... Choose between 1 and 0 ->  1
+  x3: x3=x2... Choose between 1 and 0 ->  0
+Step 1: 1 1 0
+  x1: !(x1=x3)... x1=x3, where x3=0... -> 0
+  x2: x2=x1... Choose between 1 and 0 ->  1
+  x3: !(x3=x2)... x3=x2, where x2=1... -> 1
+Step 2: 0 1 1
+  x1: !(x1=x3)... x1=x3, where x3=1... -> 1
+  x2: !(x2=x1)... x2=x1, where x1=0... -> 0
+  x3: x3=x2... Choose between 1 and 0 ->  1
+Step 3: 1 0 1
+  x1: x1=x3... Choose between 1 and 0 ->  0
+  x2: !(x2=x1)... x2=x1, where x1=1... -> 1
+  x3: !(x3=x2)... x3=x2, where x2=0... -> 0
+Step 4: 0 1 0

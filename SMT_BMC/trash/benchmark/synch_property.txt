@@ -1,0 +1,6 @@
+    r1 = Bool("r1")
+    r2= Bool("r2")
+
+    property = (And(r1==True, r2==True))  # As of right now, we have to negate the property ourselves
+
+    property_probability = 1

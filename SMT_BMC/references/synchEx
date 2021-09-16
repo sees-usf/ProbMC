@@ -1,0 +1,13 @@
+All variables are boolean
+
+Initial: r1=r2 = 0, x either 0 or 1.
+
+# Probabilities to every possible transition
+
+x xor r1 <-> r1  
+(!x && r2) || (r1 && x) <-> r2
+
+Property: r1=r2=1 (this is not supposed to happen)
+
+
+Note: x <-> y means x -> y and y -> x
