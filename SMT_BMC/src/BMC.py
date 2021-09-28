@@ -17,6 +17,7 @@ class BMC:
         self.reached_cx_list = [] # List of cx's already reached, including prior steps.
         self.cx_list_asStrings = [] # List of cx's in the form of strings.(Only used when printing)
         self.cx_list_probablities = [] # List of only the probabilities.(Only used when printing)
+        self.constraints_list = [] # set to keep the constraints
         self.nodeList = [] # List of nodes.(Only used when printing)
         self.priorValues = [] # Keeps track of prior counter examples.(Only used when printing)
         self.priorTerminalValues = []
@@ -25,24 +26,61 @@ class BMC:
         self.booleanToCreateKey = 1
         self.nodeCounter = 0 # Couting nodes for printing. (Only used when printing)
         self.solver = Solver() # Holds all the constraints that define a bounded model
-        self.solver.add(self.model.GetInitialStates()) # Add initial states to the bounded model definition
+        if self.path_length <=1 :
+            self.solver.add(self.model.GetInitialStates()) # Add initial states to the bounded model definition
         # Increase the path_length until a counterexample that meets property_prob is found
         # or until the designated path_length is reached
         total_probability = 0
-        for i in range(1, (self.path_length+1)):
-            self.path_length = i
-            self.PathEncoding(i)
-            prob_from_step = self.Check(i, debug, modelName)
-            #print(i, prob_from_step)
-            total_probability += prob_from_step
+        temp_path_length = self.path_length
+        # for i in range(1, (temp_path_length+1)):
+        #     self.path_length = i
+        #     self.PathEncoding(i)
+        #     prob_from_step = self.Check(i, debug, modelName)
+        #     #print(i, prob_from_step)
+        #     total_probability += prob_from_step
             #if total_probability >= property_prob:
             #    print("Yes, a counterexample was found at a probability greater than {}.".format(property_prob))
             #    break
         #if total_probability < property_prob:
         #    print("No, a counterexample was not found at a probability greater than {}.".format(property_prob))
 
+        filename = 'constraints_output.smt'
+        if self.path_length == 0:
+            with open(filename, mode='w', encoding='ascii') as f: 
+                f.write("")
+                f.truncate()
+                f.close()
+        if self.path_length == 1:
+            self.PathEncoding(self.path_length)
+            prob_from_step = self.Check(self.path_length, debug, modelName)
+            if self.reached_cx_list:
+                self.solver.add(self.reached_cx_list) 
+            total_probability += prob_from_step
+            smt2 = self.solver.sexpr()
+            with open(filename, mode='w', encoding='ascii') as f: 
+                f.truncate()
+                f.write(smt2)
+                f.close()
+        if self.path_length > 1: 
+            self.solver.from_file(filename)
+            self.PathEncoding(self.path_length)
+            prob_from_step = self.Check(self.path_length, debug, modelName)
+            if self.reached_cx_list:
+                self.solver.add(self.reached_cx_list) 
+            total_probability += prob_from_step
+            smt2 = self.solver.sexpr()
+            with open(filename, mode='w', encoding='ascii') as f: 
+                f.write(smt2)
+                f.close()
+
+
+
+
+
         #print("Total probability: {}".format(total_probability))
-		
+
+
+
         if(debug == 1): # Clears txt file and prints graph.
             f = open(modelName[modelName.find('.')+1:len(modelName)] + ".output", "a") # Write to the result.txt file.
             f.truncate(0)
@@ -56,7 +94,7 @@ class BMC:
         """
         path = self.model.GetStep(step)
         self.solver.add(path)
-        
+
     def ExcludePath(self, cx_model, debug, modelName):
         """
         Returns all found counterexamples to avoid recounting. The constraints are already complemented, so there 
@@ -80,7 +118,7 @@ class BMC:
         
         cx = Not(And(cx_value_list))  # Counterexample to begin avoiding
         self.reached_cx_list.append(cx)  # Add to list of all the counterexamples to avoid
-        
+
         # Prints results to txt file
         if(debug == 1):
             if(self.booleanToCreateKey == 1):
@@ -110,7 +148,7 @@ class BMC:
         # Calculate the probability of all counterexamples that can be generated
         while(self.solver.check() == sat): # Runs when a counterexample is found
             cx_model = self.solver.model()
-
+            print(cx_model)
             # Find probability of the counterexample by multiplying all of the step's probabilities together
             probability = 1
             for z in self.model.GetTransitionProbStrings():
@@ -119,6 +157,7 @@ class BMC:
                 probability *= numerator/denominator
             
             self.solver.add(self.ExcludePath(cx_model, debug, modelName))
+            #print(self.solver)
             total_probability += probability  # Adding the probability of each cx at the given pathlength
 
         # Runs when no more counterexamples can be found
