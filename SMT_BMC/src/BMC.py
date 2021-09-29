@@ -44,6 +44,7 @@ class BMC:
         #if total_probability < property_prob:
         #    print("No, a counterexample was not found at a probability greater than {}.".format(property_prob))
 
+        debug = 0
         filename = 'constraints_output.smt'
         if self.path_length == 0:
             with open(filename, mode='w', encoding='ascii') as f: 
@@ -102,21 +103,29 @@ class BMC:
         """
         # Creating a list of each variable's value to later merge together into the full counterexample
         cx_value_list = []
-        for z in self.model.GetTransitionProbStrings(): # For all the probabilities
-            self.cx_list_probablities.append(cx_model[z])
-        for z in self.model.GetStateVaribleStrings():
-            if is_int_value(cx_model[z]): # For Integer Values
-                cx_value_list.append(z == cx_model[z])
-                self.cx_list_asStrings.append(str(z)+" == "+str(cx_model[z]))
-                #state[z]=cx_model[z]
-            elif is_true(cx_model[z]) or is_false(cx_model[z]): # For Boolean Values
-                cx_value_list.append(z == cx_model[z])
-                self.cx_list_asStrings.append(str(z)+" == "+str(cx_model[z]))
-            else:  # For Real Values
-                cx_value_list.append(z == cx_model[z])
-                self.cx_list_asStrings.append(str(z)+" == "+str(cx_model[z]))
+        # for z in self.model.GetTransitionProbStrings(): # For all the probabilities
+        #     self.cx_list_probablities.append(cx_model[z])
+        # for z in self.model.GetStateVaribleStrings():
+        #     if is_int_value(cx_model[z]): # For Integer Values
+        #         cx_value_list.append(z == cx_model[z])
+        #         self.cx_list_asStrings.append(str(z)+" == "+str(cx_model[z]))
+        #         #state[z]=cx_model[z]
+        #     elif is_true(cx_model[z]) or is_false(cx_model[z]): # For Boolean Values
+        #         cx_value_list.append(z == cx_model[z])
+        #         self.cx_list_asStrings.append(str(z)+" == "+str(cx_model[z]))
+        #     else:  # For Real Values
+        #         cx_value_list.append(z == cx_model[z])
+        #         self.cx_list_asStrings.append(str(z)+" == "+str(cx_model[z]))
+
+        for o in cx_model.decls(): 
+            if o.name().startswith('s'):
+                 z = Int(o.name())
+                 cx_value_list.append(z == cx_model[o])
+                 #self.cx_list_asStrings.append(str(o.name())+" == "+str(cx_model[o]))
+
         
         cx = Not(And(cx_value_list))  # Counterexample to begin avoiding
+        print(cx)
         self.reached_cx_list.append(cx)  # Add to list of all the counterexamples to avoid
 
         # Prints results to txt file
@@ -148,7 +157,8 @@ class BMC:
         # Calculate the probability of all counterexamples that can be generated
         while(self.solver.check() == sat): # Runs when a counterexample is found
             cx_model = self.solver.model()
-            print(cx_model)
+            # for o in cx_model.decls(): 
+            #     print (o)
             # Find probability of the counterexample by multiplying all of the step's probabilities together
             probability = 1
             for z in self.model.GetTransitionProbStrings():
