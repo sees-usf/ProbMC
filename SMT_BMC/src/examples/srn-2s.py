@@ -46,7 +46,7 @@ def GetProperty(step):
     """ Property """
     s2_nxt = Int('s2.{0}'.format(step))
 
-    property = (s2_nxt == 65)
+    property = (s2_nxt == 42)
 
     return property
 
