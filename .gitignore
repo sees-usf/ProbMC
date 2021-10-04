@@ -2,5 +2,6 @@
 SMT_BMC/src/__pycache__/
 SMT_BMC/src/constraints_output.smt
 SMT_BMC/src/constraints.smt
+SMT_BMC/src/graph.g
 *.py[cod]
 .DS_Store

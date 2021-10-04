@@ -1,9 +1,9 @@
 #!/bin/bash
 
-rm -f srn-2s.output
-rm -f constraints_output.smt
+rm -f constraintst.smt
+rm -f graph.g
 
 for ((i=0; i<=$1; i++));
 do
-	python3 main.py srn-2s $i
+	python3 bmc.py examples/two_rn.py $i 1
 done
