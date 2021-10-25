@@ -17,8 +17,6 @@
 from z3 import *
 
 # State variable strings.
-R1 = 'R1.{0}'
-R2 = 'R2.{0}'
 s2 = 's2.{0}'
 
 # Transition probability strings.
@@ -27,27 +25,23 @@ trprb = 'p.{0}'
 # List of variable and probability strings.
 probabilties = []
 state_variable_list = []
+transition_list = []
 
-def GetStep(step):
+def GetStep(i, j):
     """ Transition Relations """
-    current_R1 = Int('R1.{0}'.format(step-1))
-    current_R2 = Int('R2.{0}'.format(step-1))
-    R1_nxt = Int("R1.{0}".format(step))
-    R2_nxt = Int("R2.{0}".format(step))
-    s2 = Int('s2.{0}'.format(step-1))
-    s2_nxt = Int("s2.{0}".format(step))
-    trp = Real('p.{0}'.format(step))
+    s2 = Int('s2.{0}'.format(i))
+    s2_nxt = Int("s2.{0}".format(j))
+    trp = Real('p.{0}'.format(j))
+    trIndex = Int('trIndex.{0}'.format(j))
 
-    ranges = And(And(0 <= current_R1, current_R1 <= 1), And(0 <= current_R2, current_R2 <= 1), And(0 <= trp, trp <= 1))
-    transition_1 = And((trp * (1 + 0.025 * ToReal(s2)) == 1), s2_nxt==(s2 + 1), R1_nxt == 1, R2_nxt == 0)
-    transition_2 = And(trp==((0.025 * ToReal(s2)) / (1 + 0.025 * ToReal(s2))), s2_nxt==(s2 - 1), R1_nxt == 0, R2_nxt == 1)
+    transition_1 = And((trp * (1 + 0.025 * ToReal(s2)) == 1), s2_nxt==(s2 + 1), trIndex==0)
+    transition_2 = And(trp==((0.025 * ToReal(s2)) / (1 + 0.025 * ToReal(s2))), s2_nxt==(s2 - 1), trIndex==1)
 	
-    step = And(ranges, Or(transition_1, transition_2))
+    step = Or(transition_1, transition_2)
     
     probabilties.append(trp)
-    state_variable_list.append(R1_nxt)
-    state_variable_list.append(R2_nxt)
     state_variable_list.append(s2_nxt)
+    transition_list.append(trIndex)
 	
     return step
 
@@ -61,15 +55,11 @@ def GetProperty(step):
 
 def GetInitialStates():
     """ Initial States """
-    current_R1 = Int("R1.{0}".format(0))
-    current_R2 = Int("R2.{0}".format(0))
     trp = Real('p.{0}'.format(0))
     s2 = Int('s2.{0}'.format(0))
 
-    initial_states = And(s2 == 40,current_R1 == 0, current_R2 == 0, trp == 1)
+    initial_states = And(s2 == 40, trp == 1)
     
-    state_variable_list.append(current_R1)
-    state_variable_list.append(current_R2)
     state_variable_list.append(s2)
 
     return initial_states
@@ -79,3 +69,6 @@ def GetStateVaribleStrings(): # Return all the states not including probabilties
 
 def GetTransitionProbStrings(): # Return all the states including probabilties
     return probabilties
+    
+def GetTransition():
+    return transition_list
