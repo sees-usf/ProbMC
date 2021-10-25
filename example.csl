@@ -1,5 +1,0 @@
-P<=0.22 [!"busy" U "crash"]
-
-label "ready" = s=1 ;
-label "busy" = s=2 ;
-label "crash" = s=6 ;
