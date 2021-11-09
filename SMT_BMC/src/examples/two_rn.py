@@ -30,7 +30,8 @@ def get_property(i):
     property = (s2 == 65)
     node = Node.Node('[65]')
     node.make_terminal()
-    return [property, [node]]
+    #return [property, [node]]
+    return property
 
 def get_initial_state():
     

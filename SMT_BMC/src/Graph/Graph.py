@@ -30,9 +30,13 @@ class Graph:
 						contains_node2=True
 				if not (contains_node1): 
 					node = Node.Node(i.get_nodes()[0].name)
+					if i.get_nodes()[0].is_terminal: 
+						node.make_terminal()
 					self.nodes.append(node)
 				if not (contains_node2): 
 					node = Node.Node(i.get_nodes()[1].name)
+					if i.get_nodes()[1].is_terminal: 
+						node.make_terminal()
 					self.nodes.append(node) 
 				self.edges.append(i)
 
@@ -41,16 +45,18 @@ class Graph:
 			f.truncate()
 			f.write(state_vector)
 			f.write('\n#')
-			terminal_name = ''
+			terminal_name = []
 			for n in self.nodes: 
 				if not (n.is_terminal): 
 					f.write('\n')
 					f.write(n.name)
 				else:
-					terminal_name = n.name
+					terminal_name.append(n.name)
 			f.write('\n#\n')
-			f.write(terminal_name)
-			f.write('\n#')
+			for i in terminal_name:
+				f.write(i)
+				f.write('\n')
+			f.write('#')
 
 			for e in self.edges:
 				f.write('\n')
