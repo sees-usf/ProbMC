@@ -6,6 +6,7 @@ Stochastic verificaiton technique, *probabilistic model checking* in particular,
 
 The papers below summarizes our recent work from this project.
 
+* *A Bounded Model Checking Framework for the Analysis of Chemical Reaction Network Models*, Mohammad Ahmadi, Lukas Buecherl, Zhen Zhang, Chris Myers, Chris Winstead, Hao Zheng, IWBDA, October, 2022.
 * *A Comparison of Weighted Stochastic Simulation Methods*, Payton Thomas, Mohammad Ahmadi, Hao Zheng and Chris Myers, IWBDA, September, 2021.
 * *STAMINA: STochastic ApproximateModel-checker for INfinite-state Analysis*, Thakur Neupane, Chris J. Myers,Curtis Madsen, Hao Zheng, Zhen Zhang, CAV'19, July, 2019.
 
