@@ -1,8 +1,0 @@
-    current_x1 = Int("current_x1")
-    next_x1 = Int("next_x1")
-    current_x2 = Int("current_x2")
-    next_x2 = Int("next_x2")
-    current_x3 = Int("current_x3")
-    next_x3 = Int("next_x3")
-
-    initial_states = And(current_x1==1, current_x2==1, current_x3==1)
